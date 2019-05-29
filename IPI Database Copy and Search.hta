@@ -1,0 +1,1679 @@
+<html>
+    <head>
+        <title>IPI Paul - Database Copy and Search App</title>
+        <script type="text/vbscript">
+            Sub Actions
+                on error resume next
+                if not selAction.selectedIndex = 0 then
+                    GetRef(selAction.value)()
+                    selAction.selectedIndex = 0
+                end if  
+                if Err.number <> 0 then
+                    selAction.selectedIndex = 0
+                    if cmdSTxt.value > "" then
+                        dbSSql = cmdSTxt.value
+                    else
+                        dbSSql = "select * from [" & txtSTbl.value & "]"
+                    end if
+                    txtS = lstSPro(lstSPro.selectedIndex).innerText 
+                    msgSDb = dbSType(dbSType.selectedIndex).innerText 
+                    txtSUse = "Using " & txtS & " connection type with " & msgSDb & " and " & dbSSql
+                    tmNow = formatdatetime(now(), 2) & " " &formatdatetime(now(), 4) & " "
+                    txtError = " the following error(s) occured when trying to display records "
+                    resErr.innerHTML = resErr.innerHTML & tmNow & txtSUse & txtError & ": <br />" & Err.Description & "<br />"
+                    Err.clear
+                end if
+            End Sub
+
+            Function CentimetersToPoints(val)
+                CentimetersToPoints = (49.6063 / 1.75) * val
+            End Function
+
+            Function connDest
+                on error resume next
+                extd = getExt(txtDDb) 
+                dbd = txtDDb.value & extd
+                secd = getSec(dbDType)
+                xld = getProp(dbDType)
+                if not dbDType.value = "db" then
+                    set connD = CreateObject("ADODB.Connection")
+                    set rstD = CreateObject("ADODB.Recordset")
+                    if not inArray(array("mdf", "sdf", "sql"), dbDType.value) then
+                        connDProv = lstDPro.value & ";Data Source=" & dbd & ";" & xld & secd
+                    elseif dbDType.value = "mdf" then   
+                        connDProv = lstDPro.value & ";Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=" & getFileName("txtDDb") & ";Integrated Security=SSPI;Persist Security Info=True;"
+                    elseif dbDType.value = "sdf" then
+                        connDProv = lstDPro.value & ";Data Source=" & dbd & ";"
+                    elseif dbDType.value = "sql" then
+                        connDProv = lstDPro.value & ";Data Source=" & sqlDSvr.value & ";Initial Catalog=" & txtDDb.value & ";Integrated Security=SSPI;Persist Security Info=True;"
+                    end if
+                    dbDSql = "select top 1 * from [" & txtDTbl.value & "];"
+                    if xlsd > "" then connD.Open connDProv
+                    if Err.number = 0 then
+                        if not inArray(array("mdf", "sdf", "sql"), dbDType.value) then
+                            rstD.Open dbDSql, connDProv, 3, 3, 1
+                            set connDest = rstD
+                        else
+                            connD.ConnectionString = connDProv
+                            connD.Open
+                            set connDest = connD
+                        end if
+                    end if
+                else
+                    set connD = CreateObject("newObjects.sqlite3.dbutf8")
+                    set connDest = connD
+                    if not connD.Open(dbd) then 
+                        Err.number = 777
+                        Err.Description = "Error: " & connD.LastError
+                    end if
+                end if
+            End Function
+
+            Function connSrc
+                on error resume next
+                exts = getExt(txtSDb)
+                secs = getSec(dbSType)
+                xls = getProp(dbSType)
+                dbs = txtSDb.value & exts
+                if cmdSTxt.value > "" then
+                    dbSSql = cmdSTxt.value
+                else
+                    dbSSql = "select * from [" & txtSTbl.value & "]"
+                end if
+                if not inArray(array("db", "pdo", "php"), dbSType.value) then
+                    set connS = CreateObject("ADODB.Connection")
+                    set rstS = CreateObject("ADODB.Recordset")
+                    if not inArray(array("mdf", "sdf", "sql"), dbSType.value) then
+                        connSProv = lstSPro.value & ";Data Source=" & dbs & ";" & xls & secs
+                    elseif dbSType.value = "mdf" then   
+                        connSProv = lstSPro.value & ";Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=" & getFileName("txtSDb") & ";Integrated Security=SSPI;Persist Security Info=True;"
+                    elseif dbSType.value = "sdf" then
+                        connSProv = lstSPro.value & ";Data Source=" & dbs & ";"
+                    elseif dbSType.value = "sql" then
+                        connSProv = lstSPro.value & ";Data Source=" & sqlSSvr.value & ";Initial Catalog=" & txtSDb.value & ";Integrated Security=SSPI;Persist Security Info=True;"
+                    end if
+                    if xls > "" then connS.Open connSProv
+                    if not inArray(array("mdf", "sdf", "sql"), dbSType.value) then
+                        rstS.Open dbSSql, connSProv
+                    else
+                        connS.ConnectionString = connSProv
+                        connS.Open
+                        set rstS = connS.Execute(dbSSql)
+                    end if
+                    set connSrc = rstS
+                elseif dbSType.value = "db" then
+                    set connS = CreateObject("newObjects.sqlite3.dbutf8")
+                    set rstS = CreateObject("newObjects.utilctls.StringUtilities")
+                    set rstAdS = CreateObject("ADODB.Recordset")
+                    set cols = CreateObject("Scripting.Dictionary")
+                    if not connS.Open(dbs) then 
+                        Err.number = 777
+                        Err.Description = "Error: " & connS.LastError
+                    else
+                        set rstS = connS.Execute(dbSSql)
+                        with rstAdS
+                            set .ActiveConnection = nothing
+                            .CursorLocation = 3
+                            .LockType = 4
+                            with .Fields
+                                for each itm in rstS(1)
+                                    if itm > "" then 
+                                        .Append itm, 202, 255
+                                    cols.Add itm, null
+                                    end if
+                                next
+                            end with
+                            .Open
+                        end with
+                        for row = 1 to rstS.count
+                            col = array()
+                            itm = 1
+                            for each fld in rstS(row)
+                                ReDim Preserve col(uBound(col) + 1)
+                                col(uBound(col)) = rstS(row)(itm) 'val
+                                itm = itm + 1
+                            next
+                            with rstAdS
+                                .AddNew cols.Keys(), col'val
+                            end with
+                        next
+                        set connSrc = rstAdS
+                    end if
+                elseif dbSType.value = "pdo" then
+                    set rstS = CreateObject("ADODB.Recordset")
+                    set strm = CreateObject("ADODB.Stream")
+                    if cmdSTxt.value > "" then
+                        dbSSql = cmdSTxt.value
+                    else
+                        dbSSql = "select * from `" & txtSTbl.value & "`"
+                    end if
+                    set ws = CreateObject("WScript.Shell")
+                    scrpt = "$myPDO = new PDO('sqlite:" & dbs & "'); "
+                    scrpt = scrpt & "$res = $myPDO->query('" & replace(replace(dbSSql, "[", "`"), "]", "`") & "'); "
+		            scrpt = scrpt & "echo implode(',', array_keys($res->fetch(PDO::FETCH_ASSOC)));"
+                    scrpt = scrpt & "$myPDO = null;"
+                    set proc = ws.Exec("php -r """ & replace(scrpt, ",\""", "\""") & """")  
+                    set cols = CreateObject("Scripting.Dictionary")
+                    with rstS
+                        set .ActiveConnection = nothing
+                        .CursorLocation = 3
+                        .LockType = 4
+                        with .Fields
+                            for each itm in split(proc.StdOut.ReadAll, ",")
+                                if itm > "" then 
+                                    .Append itm, 202, 255
+                                    cols.Add itm, null
+                                end if
+                            next
+                        end with
+                        .Open
+                    end with
+                    scrpt = "$myPDO = new PDO('sqlite:" & dbs & "'); "
+                    scrpt = scrpt & "$res = $myPDO->query('" & replace(replace(dbSSql, "[", "`"), "]", "`") & "'); "
+		            scrpt = scrpt & "while ($row = $res->fetch(PDO::FETCH_ASSOC)){ "
+			        scrpt = scrpt & "echo implode('|', $row).'\n'; "
+                    scrpt = scrpt & "}"
+                    scrpt = scrpt & "$myPDO = null;"
+                    set proc = ws.Exec("php -r """ & replace(scrpt, ",\""", "\""") & """")  
+                    for each rows in split(proc.StdOut.ReadAll, "\n")
+                        if len(join(split(rows, "|"), "")) > 0 then
+                            with strm
+                                .Charset = "windows-1252"
+                                .Type = 2
+                                .Open
+                                .WriteText join(split(rows, "|"), "|")
+                                .Position = 0
+                                .Charset = "utf-8"
+                            end with
+                            with rstS
+                                .AddNew cols.Keys(), split(strm.ReadText(), "|")
+                            end with
+                            strm.Close()
+                        end if
+                    next
+                    set connSrc = rstS
+                elseif dbSType.value = "php" then
+                    set rstS = CreateObject("ADODB.Recordset")
+                    set strm = CreateObject("ADODB.Stream")
+                    if cmdSTxt.value > "" then
+                        dbSSql = cmdSTxt.value
+                    else
+                        dbSSql = "select * from `" & txtSTbl.value & "`"
+                    end if
+                    set ws = CreateObject("WScript.Shell")
+                    scrpt = "$mysqli = new mysqli('" & sqlSSvr.value & "', '" & usrName.value & "', '" & usrPwd.value & "', '" & txtSDb.value & "'); "
+                    scrpt = scrpt & "$res = $mysqli->query('" & replace(replace(dbSSql, "[", "`"), "]", "`") & "'); "
+		            scrpt = scrpt & "while ($col = $res->fetch_field()){ "
+			        scrpt = scrpt & "echo $col->name.','; "
+                    scrpt = scrpt & "}"
+                    scrpt = scrpt & "$mysqli->close();"
+                    set proc = ws.Exec("php -r """ & replace(scrpt, ",\""", "\""") & """")  
+                    set cols = CreateObject("Scripting.Dictionary")
+                    with rstS
+                        set .ActiveConnection = nothing
+                        .CursorLocation = 3
+                        .LockType = 4
+                        with .Fields
+                            for each itm in split(proc.StdOut.ReadAll, ",")
+                                if itm > "" then 
+                                    .Append itm, 202, 255
+                                    cols.Add itm, null
+                                end if
+                            next
+                        end with
+                        .Open
+                    end with
+                    scrpt = "$mysqli = new mysqli('" & sqlSSvr.value & "', '" & usrName.value & "', '" & usrPwd.value & "', '" & txtSDb.value & "'); "
+                    scrpt = scrpt & "$res = $mysqli->query('" & replace(replace(dbSSql, "[", "`"), "]", "`") & "'); "
+		            scrpt = scrpt & "while ($row = $res->fetch_assoc()){ "
+			        scrpt = scrpt & "echo implode('|', $row).'\n'; "
+                    scrpt = scrpt & "}"
+                    scrpt = scrpt & "$mysqli->close();"
+                    set proc = ws.Exec("php -r """ & replace(scrpt, ",\""", "\""") & """")  
+                    for each rows in split(proc.StdOut.ReadAll, "\n")
+                        if len(join(split(rows, "|"), "")) > 0 then
+                            with strm
+                                .Charset = "windows-1252"
+                                .Type = 2
+                                .Open
+                                .WriteText join(split(rows, "|"), "|")
+                                .Position = 0
+                                .Charset = "utf-8"
+                            end with
+                            with rstS
+                                .AddNew cols.Keys(), split(strm.ReadText(), "|")
+                            end with
+                            strm.Close()
+                        end if
+                    next
+                    set connSrc = rstS
+                end if
+                
+                set connS = nothing
+                set rstS = nothing
+            End Function
+
+            Sub createDb
+                on error resume next
+                ext = getExt(txtDDb) 
+                db = txtDDb.value & ext
+                if dbDType.value = "db" then
+                    set connSql = CreateObject("newObjects.sqlite3.dbutf8")
+                    if not connSql.Open(db) then 
+                        resErr.innerHTML = resErr.innerHTML & connSql.LastError
+                    end if
+
+                    set connSql = nothing
+                elseif dbDType.value = "pdo" then
+                    set ws = CreateObject("WScript.Shell")
+                    scrpt = "$myPDO = new PDO('sqlite:" & db & "'); "
+                    scrpt = scrpt & "$res = $myPDO->query('create database `" & getFileName("txtDDb") & "`'); "
+                    scrpt = "$myPDO = null;"
+                    set proc = ws.Exec("php -r """ & scrpt & """")  
+                    
+                    set proc = nothing
+                    set ws = nothing
+                elseif dbDType.value = "php" then
+                    set ws = CreateObject("WScript.Shell")
+                    scrpt = "$mysqli = new mysqli('" & sqlSSvr.value & "', '" & usrName.value & "', '" & usrPwd.value & "'); "
+                    scrpt = scrpt & "$res = $mysqli->query('create database `" & getFileName("txtDDb") & "`'); "
+                    scrpt = scrpt & "$mysqli->close();"
+                    set proc = ws.Exec("php -r """ & scrpt & """")  
+                    
+                    set proc = nothing
+                    set ws = nothing
+                elseif dbDType.value = "xlsx" then 
+                    db = getPath("txtDDb", "dbDType")
+                    set app = CreateObject("Excel.Application")
+                    app.visible = false
+                    set wkbk = app.Workbooks.add:
+                    
+                    wkbk.SaveAs  "" & db & "", 51:
+                    wkbk.Close false
+                    app.quit
+                    
+                    set wkbk = nothing
+                    set app = nothing
+                elseif dbDType.value = "mdf" then 
+                    set connDDb = CreateObject("ADODB.Connection") 
+                    connDDb.ConnectionString = lstDPro.value & ";Data Source=(LocalDB)\MSSQLLocalDB;Integrated Security=SSPI;Persist Security Info=True;"
+                    cmd = "create database [" & txtDDb.value & "] on (name='" & txtDDb.value & "', filename='" & getPath("txtDDb", "dbDType") & "')"
+                    connDDb.Open
+                    connDDb.Execute(cmd)
+                    connDDb.Close
+
+                    if Err.number <> 0 then 
+                        resErr.innerHTML = resErr.innerHTML & Err.Description
+                    end if
+
+                    set connDDb = nothing
+                else
+                    connProv = lstDPro.value & ";Data Source=" & db & ";" 
+                    set cat = CreateObject("ADOX.catalog") 
+                    cat.Create connProv
+
+                    if Err.number <> 0 then 
+                        resErr.innerHTML = resErr.innerHTML & Err.Description
+                    end if
+
+                    set cat = nothing
+                end if
+            End Sub
+
+            Sub createFlt
+                on error resume next
+                document.getElementById("fltTbl").outerHTML = "<table id=""fltTbl""></table>"
+                if not inArray(array("db", "pdo", "php"), dbSType.value) then
+                    cmdSTxt.value = "select top 1 * from [" & txtSTbl.value & "]"
+                elseif dbSType.value = "db" then
+                    cmdSTxt.value = "select * from [" & txtSTbl.value & "] limit 1"
+                elseif inArray(array("pdo", "php"), dbSType.value) then 
+                    cmdSTxt.value = "select * from `" & txtSTbl.value & "` limit 1"
+                end if
+                set flds = connSrc
+                
+                tbl = "<table id=""fltTbl"" style=""background-color: RGB(" & colRed.value & ", " & colGreen.value & ", " & colBlue.value & ");"">"
+                th = "<thead><tr><td class=""lbl""></td>"
+                tb = "<tbody>"
+                chk = "<tr><td class=""lbl"">Hide/Order</td>"
+                lk = "<tr><td class=""lbl"">Like</td>"
+                nlk = "<tr><td class=""lbl"">Not Like</td>"
+                win = "<tr><td class=""lbl"">In</td>"
+                eqt = "<tr><td class=""lbl"">Equals</td>"
+                btw = "<tr><td class=""lbl"">Between</td>"
+                for each fld in flds.Fields
+                    th = th & "<th>" & fld.Name & "</th>"
+                    chk = chk & "<td><input type=""checkbox"" id=""chk_" & replace(fld.Name, " ", "_spc1spc_") & """ name=""chk"" checked=""checked"" onblur=""updFlt"" />"
+                    chk = chk & tbIdx(flds.Fields.Count, "ord_" & replace(fld.Name, " ", "_spc1spc_")) 
+                    chk = chk & grps(flds.Fields.Count, "grp_" & replace(fld.Name, " ", "_spc1spc_")) & "</td>"
+                    lk = lk & "<td><input type=""text"" id=""lk_" & replace(fld.Name, " ", "_spc1spc_") & """ name=""lk"" class=""fltL"" onblur=""updFlt"" /></td>"
+                    nlk = nlk & "<td><input type=""text"" id=""nlk_" & replace(fld.Name, " ", "_spc1spc_") & """ name=""nlk"" class=""fltL"" onblur=""updFlt"" /></td>"
+                    win = win & "<td><input type=""text"" id=""win_" & replace(fld.Name, " ", "_spc1spc_") & """ name=""win"" class=""fltL"" onblur=""updFlt"" /></td>"
+                    eqt = eqt & "<td><input type=""text"" id=""eqt_" & replace(fld.Name, " ", "_spc1spc_") & """ name=""eqt"" class=""fltL"" onblur=""updFlt"" /></td>"
+                    btw = btw & "<td><input type=""text"" id=""gt_" & replace(fld.Name, " ", "_spc1spc_") & """ name=""gt"" class=""fltS"" onblur=""updFlt"" /> &nbsp;"
+                    btw = btw & "<input type=""text"" id=""lt_" & replace(fld.Name, " ", "_spc1spc_") & """ name=""lt"" class=""fltS"" onblur=""updFlt"" /></td>"
+                next
+                th = th & "</tr></thead>"
+                chk = chk & "</tr>"
+                lk = lk & "</tr>"
+                nlk = nlk & "</tr>"
+                win = win & "</tr>"
+                eqt = eqt & "</tr>"
+                btw = btw & "</tr>"
+                tb = tb & chk & lk & nlk & win & eqt & btw &"</tbody>"
+                tbl = tbl & th & tb & "</table>"
+                document.getElementById("fltTbl").outerHTML = tbl
+                document.getElementById("fltDiv").style.display = "inline"
+                
+                cmdSTxt.value = ""
+                set connS = nothing
+                set flds = nothing
+            End Sub
+
+            Sub createPpt(pptSlide, pos)
+                cols = document.getElementById("rstFrm").contentWindow.document.getElementById("rstTbl").rows(0).cells.length
+                rows = document.getElementById("rstFrm").contentWindow.document.getElementById("rstTbl").rows.length
+                if rows > 12 then
+                    mrows = 12
+                    rows = rows - 11
+                else
+                    mrows = rows
+                end if
+                pos = pos + 1
+                set sld = pptSlide.Slides.Add(pos, 12)
+                set shpTbl = sld.Shapes.AddTable(mrows, cols)
+                shpTbl.Top = 20
+                shpTbl.Left = 20
+                shpTbl.Width = 920
+                shpTbl.Height = (500 / 12) * mrows
+                i = 1
+                for each row in document.getElementById("rstFrm").contentWindow.document.getElementById("rstTbl").rows
+                    if getModulo(13, i) = 0 then
+                        pos = pos + 1
+                        set sld = pptSlide.Slides.Add(pos, 12)
+                        if rows > 12 then
+                            mrows = 12
+                            rows = rows - 11
+                        else
+                            mrows = rows
+                        end if
+                        set shpTbl = sld.Shapes.AddTable(mrows, cols)
+                        shpTbl.Top = 20
+                        shpTbl.Left = 20
+                        shpTbl.Width = 920
+                        shpTbl.Height = (500 / 12) * mrows
+                        i = 1
+                        j = 1
+                        for each cell in document.getElementById("rstFrm").contentWindow.document.getElementById("rstTbl").rows(0).cells
+                            with shpTbl.Table.Cell(i, j).Shape.TextFrame.TextRange
+                                .Text = cell.innerText
+                                .Font.Size = 10
+                            end with
+                            with shpTbl.Table.Cell(i, j)
+                                .Borders(1).ForeColor.RGB = RGB(colRed.value, colGreen.value, colBlue.value)
+                                .Borders(2).ForeColor.RGB = RGB(colRed.value, colGreen.value, colBlue.value)
+                                .Borders(3).ForeColor.RGB = RGB(colRed.value, colGreen.value, colBlue.value)
+                                .Borders(4).ForeColor.RGB = RGB(colRed.value, colGreen.value, colBlue.value)
+                            end with
+                            shpTbl.Table.Cell(i, j).Shape.Fill.ForeColor.RGB = RGB(colRed.value, colGreen.value, colBlue.value)
+                            j = j + 1
+                        next
+                        i = i + 1
+                    end if
+                    j = 1
+                    for each cell in row.cells
+                        with shpTbl.Table.Cell(i, j).Shape.TextFrame.TextRange
+                            .Text = cell.innerText
+                            .Font.Size = 10
+                        end with
+                        with shpTbl.Table.Cell(i, j)
+                            .Borders(1).ForeColor.RGB = RGB(colRed.value, colGreen.value, colBlue.value)
+                            .Borders(2).ForeColor.RGB = RGB(colRed.value, colGreen.value, colBlue.value)
+                            .Borders(3).ForeColor.RGB = RGB(colRed.value, colGreen.value, colBlue.value)
+                            .Borders(4).ForeColor.RGB = RGB(colRed.value, colGreen.value, colBlue.value)
+                        end with
+                        if i = 1 then
+                            shpTbl.Table.Cell(i, j).Shape.Fill.ForeColor.RGB = RGB(colRed.value, colGreen.value, colBlue.value)
+                        else
+                            shpTbl.Table.Cell(i, j).Shape.Fill.ForeColor.RGB = RGB(255, 255, 255)
+                        end if
+                        j = j + 1
+                    next
+                    i = i + 1
+                next
+            End Sub
+            
+            Sub createTbl
+                on error resume next
+                document.getElementById("cmdSTxt").style.display = "none"
+                document.getElementById("fltDiv").style.display = "none"
+                ext = getExt(txtDDb) 
+                db = txtDDb.value & ext
+                if not inArray(array("accdb", "mdb", "xlsx"), dbDType.value) then
+                    cmd = "create table [" & replace(txtSTbl.value, "$", "") & "](" & getColumns("") & ")"
+                end if
+                if dbDType.value = "db" then
+                    set connSql = CreateObject("newObjects.sqlite3.dbutf8")
+                    set rstSql = CreateObject("newObjects.utilctls.StringUtilities")
+                    if not connSql.Open(db) then 
+                        resErr.innerHTML = resErr.innerHTML & connSql.LastError
+                    else
+                        set rstSql = connSql.Execute(cmd)
+                    end if
+
+                    set rstSql = nothing
+                    set connSql = nothing
+                elseif inArray(array("mdf", "sdf", "sql"), dbDType.value) then
+                    set connSql = CreateObject("ADODB.Connection")
+                    if dbDType.value = "mdf" then   
+                        connSql.ConnectionString = lstDPro.value & ";Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=" & getFileName("txtDDb") & ";Integrated Security=SSPI;Persist Security Info=True;"
+                    elseif dbDType.value = "sdf" then
+                        connSql.ConnectionString = lstDPro.value & ";Data Source=" & db & ";"
+                    elseif dbDType.value = "sql" then
+                        connSql.ConnectionString = lstDPro.value & ";Data Source=" & sqlDSvr.value & ";Initial Catalog=" & getFileName("txtDDb") & ";Integrated Security=SSPI;Persist Security Info=True;"
+                    end if
+                    connSql.Open
+                    connSql.Execute(cmd)
+
+                    set connSql = nothing
+                elseif dbDType.value = "pdo" then
+                    set ws = CreateObject("WScript.Shell")
+                    scrpt = "$myPDO = new PDO('sqlite:" & db & "'); "
+                    scrpt = scrpt & "$res = $myPDO->query('" & replace(replace(replace(cmd, "[", "`"), "]", "`"), """", "\""") & "'); "
+                    set proc = ws.Exec("php -r """ & scrpt & """")  
+                    
+                    set proc = nothing
+                    set ws = nothing
+                elseif dbDType.value = "php" then
+                    set ws = CreateObject("WScript.Shell")
+                    scrpt = "$mysqli = new mysqli('" & sqlDSvr.value & "', '" & usrName.value & "', '" & usrPwd.value & "', '" & txtDDb.value & "'); "
+                    scrpt = scrpt & "$res = $mysqli->query('" & replace(replace(cmd, "[", "`"), "]", "`") & "'); "
+                    set proc = ws.Exec("php -r """ & scrpt & """")  
+                    
+                    set proc = nothing
+                    set ws = nothing
+                else
+                    xls = getProp(dbDType)
+                    set cat = CreateObject("ADOX.Catalog")
+                    set tbl = CreateObject("ADOX.Table")
+
+                    cat.ActiveConnection = lstDPro.value & ";Data Source=" & db & ";" & xls
+                    tbl.Name = replace(txtSTbl.value, "$", "")
+                    cat.Tables.Append getColumns(tbl):
+            
+                    set tbl = nothing:
+                    set cat = nothing:
+                end if
+                    if Err.number <> 0 then 
+                        resErr.innerHTML = resErr.innerHTML & " You may have to reload the page. Error: " & Err.number & " " & Err.Description & "<br />"
+                        Err.Clear
+                    end if
+            End Sub
+
+            Sub createWord(wordDoc, tblRange)
+                cols = document.getElementById("rstFrm").contentWindow.document.getElementById("rstTbl").rows(0).cells.length
+                rows = document.getElementById("rstFrm").contentWindow.document.getElementById("rstTbl").rows.length
+                set tbl = wordDoc.Application.Selection.Tables.Add(tblRange, rows, cols)
+                with tbl.borders
+                    .InsideLineStyle = 1
+                    .OutsideLineStyle = 1
+                    .InsideColor = RGB(colRed.value, colGreen.value, colBlue.value)
+                    .OutsideColor = RGB(colRed.value, colGreen.value, colBlue.value)
+                end with
+                i = 1
+                pg = tbl.Rows(1).Range.Information(3)
+                for each row in document.getElementById("rstFrm").contentWindow.document.getElementById("rstTbl").rows
+                    if pg < tbl.Rows(i).Range.Information(3) then
+                        pg = tbl.Rows(i).Range.Information(3)
+                        tbl.Rows.Add tbl.Rows(i)
+                        j = 1
+                        for each cell in document.getElementById("rstFrm").contentWindow.document.getElementById("rstTbl").rows(0).cells
+                            tbl.Rows(i).Cells(j).range.text = cell.innerText
+                            tbl.Rows(i).Cells(j).range.Shading.BackgroundPatternColor = RGB(colRed.value, colGreen.value, colBlue.value)
+                            tbl.Rows(i).Cells(j).range.font.bold = true
+                            j = j + 1
+                        next
+                        i = i + 1
+                    end if
+                    j = 1
+                    for each cell in row.cells
+                        tbl.Rows(i).Cells(j).range.text = cell.innerText
+                        if i = 1 then 
+                            tbl.Rows(i).Cells(j).range.Shading.BackgroundPatternColor = RGB(colRed.value, colGreen.value, colBlue.value)
+                            tbl.Rows(i).Cells(j).range.font.bold = true
+                        end if
+                        j = j + 1
+                    next
+                    i = i + 1
+                next
+            End Sub
+
+            Function getColumns(tbl)
+                if instr(1, txtSDb.value, ".") > 0 then 
+                    ext = "" 
+                else 
+                    ext = "." & dbSType.value 
+                end if
+                db = txtSDb.value & ext
+                if dbSType.value = "db" then
+                    cmdSTxt.value = "select * from [" & txtSTbl.value & "] limit 1"
+                elseif inArray(array("pdo", "php"), dbSType.value) then 
+                    cmdSTxt.value = "select * from `" & txtSTbl.value & "` limit 1"
+                elseif not inArray(array("db", "pdo", "php"), dbSType.value) then
+                    cmdSTxt.value = "select top 1 * from [" & txtSTbl.value & "]"
+                end if
+                if not inArray(array("db", "mdf", "pdo", "php", "sdf", "sql"), dbDType.value) then
+                    set getColumns = getFields(connSrc.Fields, tbl)
+                else
+                    getColumns = getFields(connSrc.Fields, tbl)
+                end if
+            End Function
+
+            Function getExt(elm)
+                if instr(1, elm.value, ".") > 0 then 
+                    getExt = "" 
+                elseif elm.id = txtDDb.id then
+                    getExt = "." & dbDType.value 
+                elseif elm.id = txtSDb.id then
+                    getExt = "." & dbSType.value 
+                end if
+                if getExt = ".pdo" then 
+                    getExt = ".db"
+                end if
+            End Function
+
+            Function getFields(flds, tbl)
+                on error resume next
+                if not inArray(array("db", "mdf", "pdo", "php", "sdf", "sql"), dbDType.value) then
+                    for each fld in flds
+                        set col = CreateObject("ADOX.Column")
+                        with col
+                            .Name = fld.Name
+                            .Type = 202 'adVarWChar
+                        end with
+                        Err.Clear
+                        tbl.Columns.Append col
+                        set col = nothing
+                    next
+                    set getFields = tbl
+                elseif inArray(array("db", "pdo"), dbDType.value) then
+                    col = array()
+                    for each fld in flds
+                        ReDim Preserve col(uBound(col) + 1)
+                        col(uBound(col)) = """" & fld.Name & """ text"
+                    next
+                    getFields = join(col, ",")
+                elseif inArray(array("mdf", "php", "sdf", "sql"), dbDType.value) then
+                    col = array()
+                    for each fld in flds
+                        ReDim Preserve col(uBound(col) + 1)
+                        col(uBound(col)) = "[" & fld.Name & "] nvarchar(255) NULL"
+                    next
+                    getFields = join(col, ",")
+                end if
+            End Function
+
+            Sub getFile(elm, tp)
+                ref = getPath(elm, tp)
+                if not tp = "php" and not tp = "sql" then 
+                    tps = getPDO(tp)
+                    file = Dlg.openfiledlg("" & ref & "", null, flTp & " (*." & tps & ")|*." & tps & "|All Files (*.*)|*.*|","Select a File")
+                else 
+                    file = document.getElementById(elm).value
+                end if
+                if not file = "" then
+                    document.getElementById(elm).value = file
+                    listTables elm, tp
+                end if
+            End Sub 
+
+            Function getFileName(elm)
+                getFileName = split(split(document.getElementById(elm).value, "\")(ubound(split(document.getElementById(elm).value, "\"))), ".")(0)
+            End Function
+
+            Function getPath(elm, tp)
+                ref = replace(replace(split(document.location.href, ":///")(1), "%20", " "), "/", "\")
+                if left(ref, 1) = "\" then ref = right(ref, len(ref)-1)
+                ref = left(ref, instrrev(ref, "\")-1)
+                if not tp = "php" then
+                    flTp = document.getElementById(tp)(document.getElementById(tp).selectedIndex).innerText
+                    tp = document.getElementById(tp).value
+                    doc = getFileName(elm)
+                    getPath = ref & "\" & doc & "." & getPDO(tp)
+                else
+                    getPath = ref
+                end if
+            End Function 
+            
+            Function getPDO(tp)
+                if tp = "pdo" then
+                    getPDO = "db" 
+                else
+                    getPDO = tp
+                end if                
+            End Function
+
+            Function getProp(elm)
+                if elm.value = "xlsx" then
+                    getProp = "Extended Properties=""Excel 8.0;"""'IMEX=1;HDR=YES;"""
+                else
+                    getProp = ""
+                end if
+            End Function
+
+            Function getSec(elm)
+                if elm.value = "sdf" then
+                    getSec ="Max Database Size=4091;Mode=ReadWrite|Share Deny None;SSCE:Max Buffer Size=4096;Persist Security Info=False;SSCE:Encrypt Database=False;"
+                else
+                    getSec = ""
+                end if
+            End Function
+
+            Sub getXlFile(elm, ref)
+                on error resume next
+                set shell = CreateObject("Shell.Application")
+                '16384  : Files
+                '36     : Folders
+                set file = shell.BrowseForFolder(0, "Select File", &H0001 + &H0004 + &H0010 + &H0020 + &H4000, ref)
+                if not file is nothing then
+                    document.getElementById(elm).value = file.self.Path
+                end if
+
+                set file = nothing
+                set shell = nothing
+            End Sub
+
+            Function grps(cols, id)
+                dim i
+                grps = " &nbsp; &nbsp; <select id=""" & id & """ onchange=""updFlt"" name=""grp"">"
+                optn = "<option value="""" ></option>"
+                optn = optn & "<option value=""group"" >Group</option>"
+                optn = optn & "<option value=""sum"" >Sum</option>"
+                optn = optn & "<option value=""avg"" >Average</option>"
+                optn = optn & "<option value=""count"" >Count</option>"
+                optn = optn & "<option value=""max"" >Max</option>"
+                optn = optn & "<option value=""min"" >Min</option>"
+                if inArray(array("accdb", "mdb", "xlsx"), dbSType.value) then
+                    optn = optn & "<option value=""first"" >First</option>"
+                    optn = optn & "<option value=""last"" >Last</option>"
+                end if
+                grps = grps & optn & "</select>"
+            End Function
+
+            Function insCheck(rst)
+                dim i
+                col = ""
+                for each fld in rst.Fields
+                    col = col & fld.Value
+                next
+                if len(col) > 0 then 
+                    insCheck = true
+                else
+                    insCheck = false
+                end if
+            End Function
+
+            Function inArray(arr, lkp)
+                inArray = false
+                for each itm in arr
+                    if lkp = itm then inArray = True
+                next
+            End Function
+
+            Function insFields(rst)
+                set col = CreateObject("Scripting.Dictionary")
+                for each fld in rst.Fields
+                    if len(fld.value) > 0 then
+                        val = fld.value
+                    else
+                        val = ""
+                    end if
+                    if inArray(array("db", "mdf", "sql"), dbDType.value) then
+                        col.Add "[" & fld.Name & "]", val
+                    elseif dbDType.value = "sdf" then
+                        col.Add """" & fld.Name & """", val
+                    else
+                        col.Add fld.Name, val
+                    end if
+                next
+                set insFields = col
+            End Function
+
+            Sub listTables(elm, tp)
+                on error resume next
+                doc = document.getElementById(elm).value
+                removeNode elm
+                if tp = "accdb" or tp = "mdb" then
+                    set app = CreateObject("Access.Application")
+                    app.visible = false
+                    app.OpenCurrentDataBase(doc)
+                    for each tdf in app.CurrentDb.TableDefs
+                        if not left(tdf.Name, 4) = "MSys" and not left(tdf.Name, 2) = "f_" then 
+                            createNode elm, tdf.Name
+                        end if
+                    next
+                    set app = nothing
+                elseif tp = "xlsx" then
+                    set app = CreateObject("Excel.Application")
+                    app.visible = false
+                    set wkbk = app.Workbooks.Open(doc, false, true)
+                    for each wksht in wkbk.Worksheets
+                        createNode elm, wksht.Name & "$"
+                    next
+                    for each nmdRng in wkbk.Names
+                        if not instr(1, nmdRng.Name, "Print_Area") > 0 and  not instr(1, nmdRng.Value, "#REF") > 0 and not left(nmdRng.Name, 1) = "'" then
+                            createNode elm, nmdRng.Name
+                        end if
+                    next
+
+                    wkbk.close
+                    app.quit
+                    set wkbk = nothing
+                    set app = nothing
+                elseif tp = "db" then 
+                    set connSql = CreateObject("newObjects.sqlite3.dbutf8")
+                    set rstSql = CreateObject("newObjects.utilctls.StringUtilities")
+                    if not connSql.Open(doc) then 
+                        resMs.innerHTML = resMs.innerHTML & connSql.LastError
+                    else
+                        cmd = "select name from sqlite_master"
+                        set rstSql = connSql.Execute(cmd)
+                        dim i
+                        for i = 1 to rstSql.count
+                            createNode elm, rstSql(i)(1)
+                        next
+                    end if
+
+                    set rstSql = nothing
+                    set connSql = nothing
+                elseif tp = "mdf" or tp = "sdf" or tp = "sql" then 
+                    set connSql = CreateObject("ADODB.Connection")
+                    set rstSql = CreateObject("ADODB.Recordset")
+                    if elm = "txtSDb" then 
+                        prov = lstSPro.value
+                        svr = sqlSSvr.value
+                    else
+                        prov = lstDPro.value
+                        svr = sqlDSvr.value
+                    end if
+                    cmd = "select TABLE_NAME from information_schema.tables"
+                    if tp = "mdf" then   
+                        connSql.ConnectionString = prov & ";Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=" & getFileName(elm) & ";Integrated Security=SSPI;Persist Security Info=True;"
+                    elseif tp = "sdf" then
+                        connSql.ConnectionString = prov & ";Data Source=" & doc & ";"
+                    elseif tp = "sql" then
+                        connSql.ConnectionString = prov & ";Data Source=" & svr & ";Initial Catalog=" & getFileName(elm) & ";Integrated Security=SSPI;Persist Security Info=True;"
+                    end if
+                    connSql.Open
+                    set rstSql = connSql.Execute(cmd)
+                    while not rstSql.BOF and not rstSql.EOF
+                        for each fld in rstSql.Fields
+                            createNode elm, fld.Value
+                        next
+                        rstSql.MoveNext
+                    wend
+
+                    set rstSql = nothing
+                    set connSql = nothing
+                elseif tp = "pdo" then
+                    if elm = "txtSDb" then 
+                        svr = sqlSSvr.value
+                    else
+                        svr = sqlDSvr.value
+                    end if
+                    cmd = "select name from sqlite_master"
+                    set ws = CreateObject("WScript.Shell")
+                    scrpt = "$myPDO = new PDO('sqlite:" & doc & "'); "
+                    scrpt = scrpt & "$res = $myPDO->query('" & cmd & "'); "
+		            scrpt = scrpt & "while ($row = $res->fetch(PDO::FETCH_ASSOC)){"
+                    scrpt = scrpt & "echo implode('|', $row).',';"
+                    scrpt = scrpt & "}"
+                    scrpt = scrpt & "$myPDO = null;"
+                    set proc = ws.Exec("php -r """ & scrpt & """")  
+                    for each itm in split(proc.StdOut.ReadAll, ",")
+                        if itm > "" then
+                            createNode elm, itm
+                        end if
+                    next
+                elseif tp = "php" then
+                    if elm = "txtSDb" then 
+                        svr = sqlSSvr.value
+                    else
+                        svr = sqlDSvr.value
+                    end if
+                    cmd = "select TABLE_NAME from information_schema.tables where TABLE_SCHEMA = '" & getFileName(elm) & "'"
+                    set ws = CreateObject("WScript.Shell")
+                    scrpt = "$mysqli = new mysqli('" & svr & "', '" & usrName.value & "', '" & usrPwd.value & "'); "
+                    scrpt = scrpt & "$res = $mysqli->query(\""" & cmd & "\""); "
+		            scrpt = scrpt & "while ($row = $res->fetch_assoc()){ "
+			        scrpt = scrpt & "echo implode(',', $row).',';"
+                    scrpt = scrpt & "}"
+                    set proc = ws.Exec("php -r """ & scrpt & """")  
+                    for each itm in split(proc.StdOut.ReadAll, ",")
+                        if itm > "" then
+                            createNode elm, itm
+                        end if
+                    next
+                end if
+                
+            End Sub
+
+            Sub selODb(val)
+                sqlDSvr.value = ""
+                if val = "accdb" or val = "xlsx" then 
+                    lstDPro.selectedIndex=0
+                elseif val = "mdb" then 
+                    lstDPro.selectedIndex=1
+                elseif val = "sql" then 
+                    lstDPro.selectedIndex=2
+                    sqlDSvr.value =selDSvr(2).value
+                    txtDDb.value = getFileName("txtDDb")
+                elseif val = "sdf" then 
+                    lstDPro.selectedIndex=3
+                elseif val = "mdf" then 
+                    lstDPro.selectedIndex=4
+                elseif val = "db" then 
+                    lstDPro.selectedIndex=5
+                elseif val = "pdo" then 
+                    lstDPro.selectedIndex=6
+                elseif val = "php" then 
+                    lstDPro.selectedIndex=7
+                    sqlDSvr.value =selDSvr(1).value
+                    txtDDb.value = getFileName("txtDDb")
+                end if
+                if val = "xlsx" then 
+                    if not selDTbl.value = txtDTbl.value and not right(txtDTbl.value, 1) = "$" then txtDTbl.value = txtDTbl.value & "$"
+                else
+                    if right(txtDTbl.value, 1) = "$" then txtDTbl.value = left(txtDTbl.value, len(txtDTbl.value) - 1)
+                end if
+            End Sub
+
+            Sub selSDb(val)
+                sqlSSvr.value = ""
+                if val = "accdb" or val = "xlsx" then 
+                    lstSPro.selectedIndex=0
+                elseif val = "mdb" then 
+                    lstSPro.selectedIndex=1
+                elseif val = "sql" then 
+                    lstSPro.selectedIndex=2
+                    sqlSSvr.value =selSSvr(2).value
+                    txtSDb.value = getFileName("txtSDb")
+                elseif val = "sdf" then 
+                    lstSPro.selectedIndex=3
+                elseif val = "mdf" then 
+                    lstSPro.selectedIndex=4
+                elseif val = "db" then 
+                    lstSPro.selectedIndex=5
+                elseif val = "pdo" then 
+                    lstSPro.selectedIndex=6
+                elseif val = "php" then 
+                    lstSPro.selectedIndex=7
+                    sqlSSvr.value =selSSvr(1).value
+                    txtSDb.value = getFileName("txtSDb")
+                end if
+                if val = "xlsx" then 
+                    if not selSTbl.value = txtSTbl.value and not right(txtSTbl.value, 1) = "$" then txtSTbl.value = txtSTbl.value & "$"
+                else
+                    if right(txtSTbl.value, 1) = "$" then txtSTbl.value = left(txtSTbl.value, len(txtSTbl.value) - 1)
+                end if
+            End Sub
+
+            Sub send2NewOLk
+                set olApp = CreateObject("Outlook.Application")
+                set oMail = olApp.CreateItem(olMailItem)
+                oMail.Display
+                oMail.HTMLBody = "<br /><br /><div>" & document.getElementById("rstFrm").contentWindow.document.getElementById("rstTbl").outerHtml & "</div><br /><br />" & oMail.HTMLBody
+            End Sub
+
+            Sub send2NewPpt
+                set pptApp = CreateObject("Powerpoint.Application")
+                pptApp.Visible = True
+                set pptSlide = pptApp.Presentations.Add
+                createPpt pptSlide, 0
+            End Sub
+
+            Sub send2NewWord
+                set wordApp = CreateObject("Word.Application")
+                set wordDoc = wordApp.Documents.Add
+                wordDoc.PageSetup.Orientation = 1
+                wordApp.Visible = True
+                with wordDoc.PageSetup
+                    .TopMargin = CentimetersToPoints(1.75)
+                    .LeftMargin = CentimetersToPoints(1.75)
+                    .BottomMargin = CentimetersToPoints(1.75)
+                    .RightMargin = CentimetersToPoints(1.75)
+                end with
+                createWord wordDoc, wordDoc.Range
+            End Sub
+
+            Sub send2OLk
+                set olApp = GetObject(,"Outlook.Application")
+                set oMail = olApp.ActiveInspector.CurrentItem
+                oMail.GetInspector.WordEditor.Application.Selection.Text = "placeHere"
+                tbl = "<br /><br /><div>" & document.getElementById("rstFrm").contentWindow.document.getElementById("rstTbl").outerHtml & "</div><br /><br />"
+                oMail.HTMLBody = replace(oMail.HTMLBody, "placeHere", tbl)
+            End Sub
+
+            Sub send2Ppt
+                set pptApp = GetObject(,"Powerpoint.Application")
+                set pptSlide = pptApp.ActivePresentation
+                createPpt pptSlide, pptApp.ActiveWindow.Selection.SlideRange.SlideNumber
+            End Sub
+
+            Sub send2Word
+                set wordApp = GetObject(,"Word.Application")
+                set wordDoc = wordApp.ActiveDocument
+                createWord wordDoc, wordDoc.Application.Selection.Range
+            End Sub
+
+            Sub shwCmd
+                if document.getElementById("cmdSTxt").style.display = "inline" then 
+                    document.getElementById("cmdSTxt").style.display = "none"
+                else
+                    document.getElementById("cmdSTxt").style.display = "inline"
+                end if
+            End Sub
+
+            Sub shwFlt
+                if document.getElementById("fltDiv").style.display = "inline" then 
+                    document.getElementById("fltDiv").style.display = "none"
+                else
+                    document.getElementById("fltDiv").style.display = "inline"
+                end if
+            End Sub
+            
+            Sub src2dest
+                on error resume next
+                startTimer = now()
+                document.getElementById("cmdSTxt").style.display = "none"
+                document.getElementById("fltDiv").style.display = "none"
+                txtS = lstSPro(lstSPro.selectedIndex).innerText 
+                txtD = lstDPro(lstDPro.selectedIndex).innerText 
+                msgDDb = dbDType(dbDType.selectedIndex).innerText 
+                msgSDb = dbSType(dbSType.selectedIndex).innerText 
+                set connS = connSrc
+                if not inArray(array("pdo", "php"), dbDType.value) then
+                    set connD = connDest
+                end if
+                recs = 0
+                set txErrs = CreateObject("Scripting.Dictionary")
+                set insStr = CreateObject("Scripting.Dictionary")
+                if not connS.BOF then 
+                    connS.moveFirst
+                end if
+                while not connS.BOF and not connS.EOF
+                    if insCheck(connS) = true then
+                        set dict = insFields(connS)
+                        if not inArray(array("db", "mdf", "pdo", "php", "sdf", "sql"), dbDType.value) then
+                            connD.AddNew dict.Keys(), dict.Items()
+                        else
+                            col = 0
+                            if not inArray(array("pdo", "php"), dbDType.value) then 
+                                cols = ""
+                                cl = ","
+                            else
+                                cols = "`"
+                                cl = "`, `"
+                            end if
+                            vals = ""
+                            for each fld in dict.Keys()
+                                if col > 0 then 
+                                    cols = cols & cl
+                                    vals = vals & ","
+                                end if
+                                cols = cols & replace(fld,"'", "''") 
+                                vals = vals & "'" & replace(dict.Item(fld), "'", "''") & "'"
+                                col = col + 1
+                            next
+                            if inArray(array("pdo", "php"), dbDType.value) then 
+                                cols = cols & "`"
+                                mrec = insStr.count 
+                                if recs = 0 or mrec = 0 then insStr.Add recs, "insert into `" & replace(txtDTbl.value, "$", "") & "` (" & cols & ") values"
+                                insStr.Add insStr.Count, "(" & vals & "),"
+                                recs = recs + 1
+                            end if
+                            cmd = "insert into [" & replace(txtDTbl.value, "$", "") & "] (" & cols & ") values (" & vals & ");"
+                            if not inArray(array("pdo", "php"), dbDType.value) then
+                                connD.Execute(cmd)
+                            elseif dbDType.value = "pdo" then
+                                if getModulo(200, mrec) = 0 and mrec > 0 then
+                                    set ws = CreateObject("WScript.Shell")
+                                    scrpt = "$myPDO = new PDO('sqlite:" & txtDDb.value & getExt(txtDDb) & "'); "
+                                    scrpt = scrpt & "$res = $myPDO->query(\""" & join(insStr.Items(), " ") & "\""); "
+                                    scrpt = scrpt & "$mysPDO = null;"
+                                    set proc = ws.Exec("php -r """ & replace(scrpt, ",\""", "\""") & """")  
+                                    insStr.RemoveAll()
+                                        
+                                    set proc = nothing
+                                    set ws = nothing
+                                end if
+                            elseif dbDType.value = "php" then
+                                if getModulo(200, mrec) = 0 and mrec > 0 then
+                                    set ws = CreateObject("WScript.Shell")
+                                    scrpt = "$mysqli = new mysqli('" & sqlDSvr.value & "', '" & usrName.value & "', '" & usrPwd.value & "', '" & txtDDb.value & "'); "
+                                    scrpt = scrpt & "$res = $mysqli->query(\""" & join(insStr.Items(), " ") & "\""); "
+                                    scrpt = scrpt & "$mysqli->close();"
+                                    set proc = ws.Exec("php -r """ & replace(scrpt, ",\""", "\""") & """")  
+                                    insStr.RemoveAll()
+                                        
+                                    set proc = nothing
+                                    set ws = nothing
+                                end if
+                            end if
+                        end if
+                        if Err.number <> 0 then 
+                            if not txErrs.Exists(Err.number) then txErrs.Add Err.number, "Row " & recs & " had error: " & Err.Description
+                            Err.Clear
+                        else
+                            if not dbDType.value = "php" then 
+                                recs = recs + 1
+                                end if
+                        end if 
+                    end if
+                    connS.MoveNext
+                wend
+                connS.Close()
+                if dbDType.value = "pdo" then
+                    if insStr.Count > 0 then
+                        set ws = CreateObject("WScript.Shell")
+                        scrpt = "$myPDO = new PDO('sqlite:" & txtDDb.value & getExt(txtDDb) & "'); "
+                        scrpt = scrpt & "$res = $myPDO->query(\""" & join(insStr.Items(), " ") & "\""); "
+                        scrpt = scrpt & "$mysPDO = null;"
+                        set proc = ws.Exec("php -r """ & replace(scrpt, ",\""", "\""") & """")  
+
+                        set proc = nothing
+                        set ws = nothing
+                    end if
+                elseif dbDType.value = "php" then
+                    if insStr.Count > 0 then
+                        set ws = CreateObject("WScript.Shell")
+                        scrpt = "$mysqli = new mysqli('" & sqlDSvr.value & "', '" & usrName.value & "', '" & usrPwd.value & "', '" & txtDDb.value & "'); "
+                        scrpt = scrpt & "$res = $mysqli->query(\""" & join(insStr.Items(), " ") & "\""); "
+                        scrpt = scrpt & "$mysqli->close();"
+                        set proc = ws.Exec("php -r """ & replace(scrpt, ",\""", "\""") & """")  
+
+                        set proc = nothing
+                        set ws = nothing
+                    end if
+                end if
+                txtSUse = "Using " & txtS
+                txtDUse = " using " & txtD
+                tmNow = formatdatetime(now(), 2) & " " &formatdatetime(now(), 4) & " "
+                txtTimed = " it took " & formatdatetime(now() - startTimer, 3)
+                txtCopy = " to copy " & recs & " records from "
+                resOk.innerHTML = resOk.innerHTML & tmNow & txtSUse & txtTimed & txtCopy & msgSDb & " " & dbs & " to " & msgDDb & txtDUse & ": " & db & "<br />"
+                if Err.number <> 0 or txErrs.Count <> 0 then
+                    txtError = " the following error(s) occured when trying to copy from "
+                    resErr.innerHTML = resErr.innerHTML & tmNow & txtSUse & txtError & msgSDb & " " & dbs & " to " & msgDDb & txtDUse & " " & db & ": <br />" & Err.Description & "<br />"
+                    for each key in txErrs.Keys()
+                        resErr.innerHTML = resErr.innerHTML & "Error number: " & key & " Error Description: " & txErrs.Item(key) & "<br />"
+                    next
+                    txErrs.RemoveAll
+                    Err.clear
+                end if
+
+                set dict = nothing
+                set txErrs = nothing
+                set connS = nothing
+                set connD = nothing
+            End Sub
+
+            Sub src2rst
+                on error resume next
+                document.getElementById("cmdSTxt").style.display = "none"
+                document.getElementById("fltDiv").style.display = "none"
+                startTimer = now()
+                tbl = "<table id=""rstTbl"" style=""width:100%; background-color: RGB(" & colRed.value & ", " & colGreen.value & ", " & colBlue.value & ");"">"
+                set txErrs = CreateObject("Scripting.Dictionary")
+                set connS = connSrc
+                th = "<thead>" & src2thd(insFields(connS)) & "</thead>"
+                tb = "<tbody>"
+                recs = 0
+                if not connS.BOF then
+                    connS.MoveFirst
+                end if
+                while not connS.BOF and not connS.EOF
+                    if insCheck(connS) = true then
+                        tb = tb & src2tbdy(insFields(connS))
+                        on error resume next
+                        if Err.number <> 0 then 
+                            if not txErrs.Exists(Err.number) then txErrs.Add Err.number, "Row " & recs & " had error: " & Err.Description
+                            Err.Clear
+                        else
+                            recs = recs + 1
+                        end if 
+                    end if
+                    connS.MoveNext
+                wend
+                tb = tb & "</tbody>"
+                connS.Close()
+                on error resume next
+                if cmdSTxt.value > "" then
+                    dbSSql = cmdSTxt.value
+                else
+                    dbSSql = "select * from [" & txtSTbl.value & "]"
+                end if
+                txtS = lstSPro(lstSPro.selectedIndex).innerText 
+                msgSDb = dbSType(dbSType.selectedIndex).innerText 
+                txtSUse = "Using " & txtS & " connection type with " & msgSDb & " and " & dbSSql
+                tmNow = formatdatetime(now(), 2) & " " &formatdatetime(now(), 4) & " "
+                txtTimed = " it took " & formatdatetime(now() - startTimer, 3)
+                txtDisp = " to display " & recs & " records"
+                resOk.innerHTML = resOk.innerHTML & tmNow & txtSUse & txtTimed & txtDisp & "<br />"
+                if Err.number <> 0 or txErrs.Count <> 0 then
+                    txtError = " the following error(s) occured when trying to display records "
+                    resErr.innerHTML = resErr.innerHTML & tmNow & txtSUse & txtError & ": <br />" & Err.Description & "<br />"
+                    for each key in txErrs.Keys()
+                        resErr.innerHTML = resErr.innerHTML & "Error number: " & key & " Error Description: " & txErrs.Item(key) & "<br />"
+                    next
+                    txErrs.RemoveAll
+                    Err.clear
+                end if
+
+                tbl = tbl & th & tb & "</table>"
+                bdy = "<html><head></head><style>" & pgStl.innerHTML & "</style><body>" & tbl & "</body></html>"
+                document.getElementById("rstFrm").contentWindow.document.write("")
+                document.getElementById("rstFrm").contentWindow.document.close
+                document.getElementById("rstFrm").contentWindow.document.write(bdy)
+                document.getElementById("rstFrm").contentWindow.document.close
+            
+                set connS = nothing
+                set flds = nothing
+                set dict = nothing
+                set txErrs = nothing
+                set connS = nothing
+            End Sub
+
+            Function src2tbdy(flds)
+                tr = "<tr style=""background-color:white;"">"
+                for each fld in flds.Keys()
+                    tr = tr & "<td>" & flds.Item(fld) & "</td>"
+                next
+                src2tbdy = tr &"</tr>"
+            End Function
+
+            Function src2thd(flds)
+                tr = "<tr>"
+                for each fld in flds.Keys()
+                    tr = tr & "<th align=""left"">" & replace(replace(replace(fld, """", ""), "[", ""), "]", "") & "</th>"
+                next
+                src2thd = tr &"</tr>"
+            End Function
+
+            Function tbIdx(cols, id)
+                dim i
+                tbIdx = " &nbsp; &nbsp; <select id=""" & id & """ onchange=""tbSrt '" & id & "', " & id & ".value"" name=""ord"">"
+                optn = "<option value="""" ></option>"
+                for i = 1 to cols
+                    optn = optn & "<option value=""" & i & """ >" & i & "</option>"
+                next 
+                tbIdx = tbIdx & optn & "</select>"
+            End Function
+
+            Sub tbSrt(id, idx)
+                on error resume next
+                set ords = document.getElementsByName("ord")
+                set coll = CreateObject("System.Collections.ArrayList")
+                for each itm in ords
+                    if itm.value >= idx and not itm.id = id and idx > 0 then itm.selectedIndex = itm.selectedIndex + 1
+                    if itm.value > "" then coll.Add itm.selectedIndex & "|" & itm.id
+                next
+                coll.Sort
+                for i = 0 to coll.Count - 1
+                    document.getElementById(split(coll.item(i), "|")(1)).selectedIndex = i + 1
+                next
+                
+                updFlt
+                
+                set ords = nothing
+                set coll = nothing
+            End Sub
+
+            Sub updFlt
+                dim i
+                stmt = selType.value
+                set chks = document.getElementsByName("chk")
+                set vgrps = document.getElementsByName("grp")
+                val = ""
+                for i = 0 to vgrps.length - 1
+                    val = val & vgrps(i).value
+                next
+                col = 0
+                gcol = 0
+                vis = ""
+                for i = 0 to chks.length - 1
+                    if chks(i).checked = true then
+                        if col > 0 then vis = vis & ", "
+                        grpng = "[" & replace(replace(chks(i).id, "_spc1spc_", " ") , "chk_", "") & "]"
+                        if val > "" then 
+                            if vgrps(i).value > "" and not vgrps(i).value = "group" then 
+                                grpng = vgrps(i).value & "(" & grpng & ") as [" &  vgrps(i).value & " of " & replace(replace(vgrps(i).id, "_spc1spc_", " "), "grp_", "") & "]"
+                            else
+                                if gcol > 0 then grpBy = grpBy & ", "
+                                grpBy = grpBy & grpng    
+                                gcol = gcol + 1
+                            end if
+                        end if
+                        vis = vis & grpng & " "
+                        col = col + 1
+                    end if
+                next
+                set lks = document.getElementsByName("lk")
+                col = 0
+                vlk = ""
+                hvng = ""
+                for i = 0 to lks.length - 1
+                    if lks(i).value > "" then
+                        if col > 0 then vlk = vlk & "and "
+                        if val > "" and vgrps(i).value > "" and not vgrps(i).value = "group" then 
+                            if hvng > "" then hvng = hvng & "and "
+                            hvng = hvng & vgrps(i).value & "([" & replace(replace(lks(i).id, "_spc1spc_", " ") , "lk_", "") & "]) like '%" & replace(lks(i).value, "'", "''") & "%' "
+                        else
+                            vlk = vlk & "[" & replace(replace(lks(i).id, "_spc1spc_", " ") , "lk_", "") & "] like '%" & replace(lks(i).value, "'", "''") & "%' "
+                        end if
+                        col = col + 1
+                    end if
+                next
+                set nlks = document.getElementsByName("nlk")
+                col = 0
+                vnlk = ""
+                for i = 0 to nlks.length - 1
+                    if nlks(i).value > "" then
+                        if val > "" and vgrps(i).value > "" and not vgrps(i).value = "group" then 
+                            if hvng > "" then hvng = hvng & "and "
+                            hvng = hvng & "not " & vgrps(i).value & "([" & replace(replace(nlks(i).id, "_spc1spc_", " ") , "nlk_", "") & "]) like '%" & replace(nlks(i).value, "'", "''") & "%' "
+                        else
+                            if col > 0 then vnlk = vnlk & "and "
+                            vnlk = vnlk & "not [" & replace(replace(nlks(i).id, "_spc1spc_", " ") , "nlk_", "") & "] like '%" & replace(nlks(i).value, "'", "''") & "%' "
+                            col = col + 1
+                        end if
+                    end if
+                next
+                set wins = document.getElementsByName("win")
+                col = 0
+                vwin = ""
+                for i = 0 to wins.length - 1
+                    if wins(i).value > "" then
+                        if val > "" and vgrps(i).value > "" and not vgrps(i).value = "group" then 
+                            if hvng > "" then hvng = hvng & "and "
+                            hvng = hvng & vgrps(i).value & "([" & replace(replace(wins(i).id, "_spc1spc_", " ") , "win_", "") & "]) in ('" & join(split(replace(wins(i).value, "'", "''"), ","), "','") & "') "
+                        else
+                            if col > 0 then vwin = vwin & "and "
+                            vwin = vwin & "[" & replace(replace(wins(i).id, "_spc1spc_", " ") , "win_", "") & "] in ('" & join(split(replace(wins(i).value, "'", "''"), ","), "','") & "') "
+                            col = col + 1
+                        end if
+                    end if
+                next
+                set eqts = document.getElementsByName("eqt")
+                col = 0
+                veqt = ""
+                for i = 0 to eqts.length - 1
+                    if eqts(i).value > "" then
+                        if val > "" and vgrps(i).value > "" and not vgrps(i).value = "group" then 
+                            if hvng > "" then hvng = hvng & "and "
+                            hvng = hvng & vgrps(i).value & "([" & replace(replace(eqts(i).id, "_spc1spc_", " ") , "eqt_", "") & "]) = '" & replace(eqts(i).value, "'", "''") & "' "
+                        else
+                            if col > 0 then veqt = veqt & "and "
+                            veqt = veqt & "'' + [" & replace(replace(eqts(i).id, "_spc1spc_", " ") , "eqt_", "") & "] = '" & replace(eqts(i).value, "'", "''") & "' "
+                            col = col + 1
+                        end if
+                    end if
+                next
+                set gts = document.getElementsByName("gt")
+                col = 0
+                vgt = ""
+                for i = 0 to gts.length - 1
+                    if gts(i).value > "" then
+                        if val > "" and vgrps(i).value > "" and not vgrps(i).value = "group" then 
+                            if hvng > "" then hvng = hvng & "and "
+                            if dbSType.value = "db" or dbSType.value = "pdo" then
+                                hvng = hvng & vgrps(i).value & "(lower([" & replace(replace(gts(i).id, "_spc1spc_", " ") , "gt_", "") & "])) >= 'lower(" & replace(gts(i).value, "'", "''") & ")' "
+                            else
+                                hvng = hvng & vgrps(i).value & "([" & replace(replace(gts(i).id, "_spc1spc_", " ") , "gt_", "") & "]) >= '" & replace(gts(i).value, "'", "''") & "' "
+                            end if
+                        else
+                            if col > 0 then vgt = vgt & "and "
+                            if dbSType.value = "db" or dbSType.value = "pdo" then
+                                vgt = vgt & "lower([" & replace(replace(gts(i).id, "_spc1spc_", " ") , "gt_", "") & "]) >= lower('" & replace(gts(i).value, "'", "''") & "') "
+                            else
+                                vgt = vgt & "[" & replace(replace(gts(i).id, "_spc1spc_", " ") , "gt_", "") & "] >= '" & replace(gts(i).value, "'", "''") & "' "
+                            end if
+                            col = col + 1
+                        end if
+                    end if
+                next
+                set lts = document.getElementsByName("lt")
+                col = 0
+                vlt = ""
+                for i = 0 to lts.length - 1
+                    if lts(i).value > "" then
+                        if val > "" and vgrps(i).value > "" and not vgrps(i).value = "group" then 
+                            if hvng > "" then hvng = hvng & "and "
+                            if dbSType.value = "db" or dbSType.value = "pdo" then
+                                hvng = hvng & vgrps(i).value & "(lower([" & replace(replace(lts(i).id, "_spc1spc_", " ") , "lt_", "") & "])) <= 'lower(" & replace(lts(i).value, "'", "''") & ")' "
+                            else
+                                hvng = hvng & vgrps(i).value & "([" & replace(replace(lts(i).id, "_spc1spc_", " ") , "lt_", "") & "]) <= '" & replace(lts(i).value, "'", "''") & "' "
+                            end if
+                        else
+                            if col > 0 then vlt = vlt & "and "
+                            if dbSType.value = "db" or dbSType.value = "pdo" then
+                                vlt = vlt & "lower([" & replace(replace(lts(i).id, "_spc1spc_", " ") , "lt_", "") & "]) <= lower('" & replace(lts(i).value, "'", "''") & "') "
+                            else
+                                vlt = vlt & "[" & replace(replace(lts(i).id, "_spc1spc_", " ") , "lt_", "") & "] <= '" & replace(lts(i).value, "'", "''") & "' "
+                            end if
+                            col = col + 1
+                        end if
+                    end if
+                next
+                whrs = array(vlk, vnlk, vwin, veqt, vgt, vlt)
+                col = 0
+                for each itm in whrs
+                    if itm > "" then 
+                        if col > 0 then whr = whr & "and "
+                        whr = whr & itm
+                        col = col + 1
+                    end if
+                next
+                if whr > "" then whr = "where " & whr
+                set ords = document.getElementsByName("ord")
+                set coll = CreateObject("System.Collections.ArrayList")
+                for i = 0 to ords.length - 1
+                    if ords(i).value > "" then
+                        coll.Add ords(i).value &  "|[" & replace(replace(ords(i).id, "_spc1spc_", " ") , "ord_", "") & "] "
+                    end if
+                next
+                coll.Sort
+                for i = 0 to coll.Count - 1
+                    if i > 0 then vord = vord & ","
+                    vord = vord & split(coll(i), "|")(1)
+                next
+
+                if grpBy > "" then grpBy = " group by " & grpBy
+                if hvng > "" then hvng = " having " & hvng
+                if vord > "" then vord = " order by " & vord
+                if vis = "" then vis = "*"
+                cmdSTxt.value = stmt & vis & " from [" & txtSTbl.value & "] " & whr & grpBy & hvng & vord
+                if dbSType.value = "pdo" or dbSType.value = "php" then cmdSTxt.value = replace(replace(replace(cmdSTxt.value, "[", "`"), "]", "`"), "'", "\""")
+
+                set chks = nothing
+                set lks = nothing
+                set nlks = nothing
+                set wins = nothing
+                set eqts = nothing
+                set gts = nothing
+                set lts = nothing
+                set ords = nothing
+                set coll = nothing
+            End Sub
+
+            Sub runTest
+                exts = getExt(txtSDb)
+                dbs = txtSDb.value & exts
+                if cmdSTxt.value > "" then
+                    dbSSql = cmdSTxt.value
+                else
+                    dbSSql = "select * from [" & txtSTbl.value & "] limit 1"
+                end if
+                set ws = CreateObject("Wscript.Shell")
+                scrpt = "$myPDO = new PDO('sqlite:" & dbs & "'); "
+                scrpt = scrpt & "$res = $myPDO->query('" & replace(replace(dbSSql, "[", "`"), "]", "`") & "'); "
+		        scrpt = scrpt & "foreach ($res as $row){ "
+			    scrpt = scrpt & "echo implode('|', $row).'\n'; "
+                scrpt = scrpt & "}"
+                set proc = ws.Exec("php -r """ & replace(scrpt, ",\""", "\""") & """")  
+                msgbox proc.StdOut.ReadAll
+            End Sub
+        </script>
+        <script type="text/javascript">
+            function createCols() {
+                for (i = 0; i < 256; i++) {
+                    var optn = document.createElement("option");
+                    optn.value = i;
+                    optn.innerText = i;
+                    document.getElementById("colRed").appendChild(optn);
+                    var optn = document.createElement("option");
+                    optn.value = i;
+                    optn.innerText = i;
+                    document.getElementById("colGreen").appendChild(optn);
+                    var optn = document.createElement("option");
+                    optn.value = i;
+                    optn.innerText = i;
+                    document.getElementById("colBlue").appendChild(optn);
+                }
+                document.getElementById("colRed").selectedIndex = 135;
+                document.getElementById("colGreen").selectedIndex = 206;
+                document.getElementById("colBlue").selectedIndex = 250;
+            }
+            function createNode(elm, tdf) {
+                try {
+                    var optn = document.createElement("option");
+                    optn.value = tdf;
+                    optn.innerText = tdf;
+                    if (elm == "txtSDb") {
+                        document.getElementById("selSTbl").appendChild(optn);
+                    } else {
+                        document.getElementById("selDTbl").appendChild(optn);
+                    }
+                } catch (e) {
+                    alert(e);
+                }
+            }
+            function getModulo(cnst, val) {
+                return (val%cnst)
+            }
+            function removeNode(elm) {
+                if (elm == "txtSDb") {
+                    optns = document.getElementById("selSTbl");
+                } else {
+                    optns = document.getElementById("selDTbl");
+                }
+                var optns;
+                var ln = optns.childNodes.length - 1;
+                if (ln > 1) {
+                    for (i = 0; i < ln - 1; i++) {
+                        optns.removeChild(optns.childNodes[ln - i]);
+                    }
+                }
+            }
+        </script>
+        <style id="pgStl">
+            body, table {
+                font-size: 10pt;
+            }
+            body {
+                background-color: khaki;
+                margin: 0px 0px 0px 0px;
+            }
+            input {
+                border: thin;
+            }
+            .lbl { 
+                width: 50px; 
+            } 
+            .fltL { 
+                width: 171px; 
+            } 
+            .fltS { 
+                width: 82px; 
+            }
+            .log {
+                display: block;
+                height: 10%;
+                max-height: 85px;
+                overflow-y: scroll;
+            }
+            .fltDiv {
+                display: none;
+                height: 105px;
+                max-height: 105px;
+                width: 100%;
+                overflow-x: scroll;
+            }
+        </style>
+    </head>
+    <object id="Dlg" classid="CLSID:3050F4E1-98B5-11CF-BB82-00AA00BDCE0B" width="0" height="0" />
+    <body onload="createCols">
+        <div>
+            <table>
+                <tr>
+                    <th>Source Type</th>
+                    <th>Source Dirvers/Providers</th>
+                    <th>Source Path and File Name</th>
+                    <th>Source Table/Workbook/Named Range</th>
+                </tr>
+                <tr>
+                    <td>
+                        <select id="dbSType" onchange="selSDb(dbSType.value)">
+                            <option value="accdb">Microsoft ACCDB</option>
+                            <option value="mdb">Microsoft MDB</option>
+                            <option value="sql">SQL</option>
+                            <option value="sdf">SQL CE</option>
+                            <option value="mdf">SQL MDF</option>
+                            <option value="db">SQLite</option>
+                            <option value="xlsx">Excel</option>
+                            <option value="pdo">MySQL PDO</option>
+                            <option value="php">MySQL PHP</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select id="lstSPro">
+                            <option value="Provider=Microsoft.ACE.OLEDB.12.0">Microsoft ACE OLEDB 12.0</option>
+                            <option value="Provider=Microsoft.Jet.OLEDB.4.0">Microsoft Jet OLEDB 4.0</option>
+                            <option value="Provider=SQLOLEDB.1">Microsoft SQL SERVER OLEDB 1.0</option>
+                            <option value="Provider=Microsoft.SQLSERVER.CE.OLEDB.4.0">Microsoft SQL SERVER CE OLEDB 4.0</option>
+                            <option value="Provider=SQLNCLI11.1">Microsoft SQL SERVER LocalDB</option>
+                            <option value="Driver=SQLite3 ODBC Driver">SQLite3 Datasource</option>
+                            <option value="PDO Process Call">MySQL using PDO</option>
+                            <option value="PHP Process Call">MySQL using PHP</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" id="txtSDb" size="90" value="Test" />
+                        <input type="button" value="..." onclick="getFile 'txtSDb', 'dbSType'" />
+                    </td>
+                    <td>
+                        <input type="text" id="txtSTbl" size="59" value="Table1" />
+                        <select id="selSTbl" onchange="txtSTbl.value = selSTbl.value" style="width:23px;">
+                            <option value=""></option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Destination Type</th>
+                    <th>Destination Dirver/Provider</th>
+                    <th>Destination Path and File Name</th>
+                    <th>Destination Table/Workbook/Named Range</th>
+                </tr>
+                <tr>
+                    <td>
+                        <select id="dbDType" onchange="selODb(dbDType.value)">
+                            <option value="accdb">Microsoft ACCDB</option>
+                            <option value="mdb">Microsoft MDB</option>
+                            <option value="sql">SQL</option>
+                            <option value="sdf">SQL CE</option>
+                            <option value="mdf">SQL MDF</option>
+                            <option value="db">SQLite</option>
+                            <option value="xlsx">Excel</option>
+                            <option value="pdo">MySQL PDO</option>
+                            <option value="php">MySQL PHP</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select id="lstDPro">
+                            <option value="Provider=Microsoft.ACE.OLEDB.12.0">Microsoft ACE OLEDB 12.0</option>
+                            <option value="Provider=Microsoft.Jet.OLEDB.4.0">Microsoft Jet OLEDB 4.0</option>
+                            <option value="Provider=SQLOLEDB.1">Microsoft SQL SERVER OLEDB 1.0</option>
+                            <option value="Provider=Microsoft.SQLSERVER.CE.OLEDB.4.0">Microsoft SQL SERVER CE OLEDB 4.0</option>
+                            <option value="Provider=SQLNCLI11.1;">Microsoft SQL SERVER LocalDB</option>
+                            <option value="Driver=SQLite3 ODBC Driver">SQLite3 Datasource</option>
+                            <option value="PDO Process Call">MySQL using PDO</option>
+                            <option value="PHP Process Call">MySQL using PHP</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" id="txtDDb" size="90" value="Test" />
+                        <input type="button" value="..." onclick="getFile 'txtDDb', 'dbDType'" />
+                    </td>
+                    <td>
+                        <input type="text" id="txtDTbl" size="59" value="Table1" />
+                        <select id="selDTbl" onchange="txtDTbl.value = selDTbl.value" style="width:23px;">
+                            <option value="" tabindex="-1"></option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        Source SQL: <input type="text" size="24" id="sqlSSvr" />
+                        <select id="selSSvr" onchange="sqlSSvr.value = selSSvr.value" style="width:23px;">
+                            <option value="" tabindex="-1"></option>
+                            <option value="localhost">MySQL</option>
+                            <option value="YourNetwork\YourSvr">SQL Server</option>
+                        </select>
+                        &nbsp; 
+                        Destination: <input type="text" size="20" id="sqlDSvr" />                        
+                        <select id="selDSvr" onchange="sqlDSvr.value = selDSvr.value" style="width:23px;">
+                            <option value="" tabindex="-1"></option>
+                            <option value="localhost">MySQL</option>
+                            <option value="YourNetwork\YourSvr">SQL Server</option>
+                        </select>
+                        &nbsp; 
+                        User: <input type="text" id="usrName" size="14" value="YourUserName" />
+                        Password: <input type="password" id="usrPwd" size="14" value="YourPassword" />
+                        <select id="colRed"></select>
+                        <select id="colGreen"></select>
+                        <select id="colBlue"></select>
+                    </td>
+                    <td align="right">
+                        <select id="selType" onchange="updFlt">
+                            <option value="select ">Select</option>
+                            <option value="select distinct ">Select Distinct</option>
+                        </select>
+                        <select id="selAction" onchange="Actions()">
+                            <option value="">Select an Action to Perform</option>
+                            <option value="createDb">Create Destination Database</option>
+                            <option value="createTbl">Create Destination Tables</option>
+                            <option value="src2dest">Copy Source to Destination</option>
+                            <option value="createFlt">Create Source Db Filters</option>
+                            <option value="src2rst">Search Records / Run Transaction</option>
+                            <option value="shwFlt">Show/Hide Filters</option>
+                            <option value="shwCmd">Show/Hide Command Text</option>
+                            <option value="send2NewOlk">Send to New Oultook Email</option>
+                            <option value="send2Olk">Send to Open Oultook Email</option>
+                            <option value="send2NewPpt">Send to New Power Point Document</option>
+                            <option value="send2Ppt">Send to Open Power Point Document</option>
+                            <option value="send2NewWord">Send to New Word Document</option>
+                            <option value="send2Word">Send to Open Word Document</option>
+                            <option value="runTest">Run Test</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <br />
+        </div>
+        <div id="fltDiv" class="fltDiv">
+            <table id="fltTbl"></table>
+        </div>
+        <div>
+            <textarea id="cmdSTxt" cols="172" rows="20" style="display: none;"></textarea>
+        </div>
+        <div>
+            <iframe id="rstFrm" width="100%" height="70%"></iframe>
+        </div>
+        <div class="log">
+            <table width="100%">
+                <tr>
+                    <th width="50%">Completion Description</th>
+                    <th width="50%">Error Description</th>
+                </tr>
+                <tr>
+                    <td>
+                        <span id="resOk"> </span>
+                    </td>
+                    <td>
+                        <span id="resErr"></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>
