@@ -1,0 +1,79 @@
+TrackName	FilePath	Played	Favourite	FileURL
+1 Mix House	http://www.internetradiouk.com/mobile/1mix/	0	Radio Indexed Db	http://listen.1mix.co.uk/
+1 Mix House	http://www.internetradiouk.com/mobile/1mix/	0	Radio Stream	http://fr5.1mix.co.uk:8020/listen.pls
+Absolute 80s	https://tunein.com/radio/Absolute-80s-s117787/	0	Radio Indexed Db	https://tunein.com/radio/Absolute-80s-s117787/
+Absolute 80s	http://www.internetradiouk.com/mobile/absolute-80s/	0	Radio Stream	http://icy-e-bab-09-boh.sharp-stream.com/absolute80s.aac.m3u
+Absolute Classic Rock	https://player.absoluteradio.co.uk/classic-rock/	0	Radio Indexed Db	https://player.absoluteradio.co.uk/classic-rock/
+Absolute Classic Rock	http://www.internetradiouk.com/mobile/classic-rock/	0	Radio Stream	http://icy-e-bab-09-boh.sharp-stream.com/absoluteclassicrock.aac.m3u
+Absolute Radio	http://www.internetradiouk.com/mobile/absolute/	0	Radio Stream	http://icy-e-bab-02-gos.sharp-stream.com/absoluteradio.aac.m3u
+Amazing FM	https://tunein.com/radio/Amazing-Radio-s105824/	0	Radio Indexed Db	https://tunein.com/radio/Amazing-Radio-s105824/
+Amazing FM	http://www.internetradiouk.com/mobile/amazing/	0	Radio Stream	http://109.74.195.10:8000/stream.mp3?redirected=1
+Arrow FM	http://www.internetradiouk.com/mobile/arrowfm/	0	Radio Stream	http://s3.xrad.io:8092/listen.pls?sid=1
+BBC Radio 1	https://tunein.com/radio/BBC-Radio-1-988-s24939/	0	Radio Indexed Db	https://tunein.com/radio/BBC-Radio-1-988-s24939/
+BBC Radio 1	http://www.internetradiouk.com/mobile/bbc-1	0	Radio Stream	http://a.files.bbci.co.uk/media/live/manifesto/audio/simulcast/hls/nonuk/low/ak/bbc_radio_one.m3u8
+BBC Radio 1 Xtra	https://tunein.com/radio/BBC-Radio-1Xtra-s20277/	0	Radio Indexed Db	https://tunein.com/radio/BBC-Radio-1Xtra-s20277/
+BBC Radio 1 Xtra	http://www.internetradiouk.com/mobile/1xtra/	0	Radio Stream	http://a.files.bbci.co.uk/media/live/manifesto/audio/simulcast/hls/nonuk/low/ak/bbc_1xtra.m3u8
+BBC Radio 2	https://tunein.com/radio/BBC-Radio-2-891-s24940/	0	Radio Indexed Db	https://tunein.com/radio/BBC-Radio-2-891-s24940/
+BBC Radio 2	http://www.internetradiouk.com/mobile/bbc-2	0	Radio Stream	http://open.live.bbc.co.uk/mediaselector/5/select/version/2.0/mediaset/http-icy-mp3-a/vpid/bbc_radio_two/format/pls.pls
+BBC Radio 3	http://www.internetradiouk.com/mobile/bbc-3	0	Radio Stream	http://a.files.bbci.co.uk/media/live/manifesto/audio/simulcast/hls/nonuk/low/ak/bbc_radio_three.m3u8
+BBC Radio 3 Indexed Db	https://tunein.com/radio/BBC-Radio-3-913-s24941/	0	Radio Indexed Db	https://tunein.com/radio/BBC-Radio-3-913-s24941/
+BBC Radio 4	https://tunein.com/radio/BBC-Radio-4-935-s25419/	0	Radio Indexed Db	https://tunein.com/radio/BBC-Radio-4-935-s25419/
+BBC Radio 4	http://www.internetradiouk.com/mobile/bbc-4	0	Radio Stream	http://open.live.bbc.co.uk/mediaselector/5/select/version/2.0/mediaset/http-icy-mp3-a/vpid/bbc_radio_fourfm/format/pls.pls
+BBC World Service Indexed Db	https://tunein.com/radio/BBC-World-Service-UK-s50646/	0	Radio Indexed Db	https://tunein.com/radio/BBC-World-Service-UK-s50646/
+BBC World Service	http://www.internetradiouk.com/mobile/bbc-world-service	0	Radio Stream	http://bbcwssc.ic.llnwd.net/stream/bbcwssc_mp1_ws-einws.m3u
+Capital FM UK	http://www.internetradiouk.com/mobile/capital/	0	Radio Stream	http://media-ice.musicradio.com/Capital.m3u
+Capital FM UK	http://media-sov.musicradio.com:80/Capital	0	Radio Indexed Db	http://media-sov.musicradio.com:80/Capital
+Capital Xtra	https://tunein.com/radio/Capital-XTRA-London-1071-s25836/	0	Radio Indexed Db	https://tunein.com/radio/Capital-XTRA-London-1071-s25836/
+Capital Xtra	http://www.internetradiouk.com/mobile/choice-london/	0	Radio Stream	http://media-ice.musicradio.com/CapitalXTRALondonMP3.m3u
+Classic FM	http://media-sov.musicradio.com:80/ClassicFM	0	Radio Indexed Db	http://media-sov.musicradio.com:80/ClassicFM
+Classic FM	http://www.classicfm.com/radio/how-to-listen/listening-online/	0	Radio Indexed Db	http://www.classicfm.com/radio/how-to-listen/listening-online/
+Classic FM	http://www.classicfm.com/radio/player/	0	Radio Indexed Db	http://www.classicfm.com/radio/player/
+Classic FM UK	http://www.internetradiouk.com/mobile/classic-fm/	0	Radio Stream	http://vis.media-ice.musicradio.com/ClassicFMMP3.m3u
+Discover Trance UK	http://www.discovertrance.com/DT-WebPlayer.aspx	0	Radio Indexed Db	http://www.discovertrance.com/DT-WebPlayer.aspx
+Discover Trance UK	http://www.internetradiouk.com/mobile/discover-trance-uk/	0	Radio Stream	http://loki.discovertrance.com/listen.pls
+Fun Radio	https://tunein.com/radio/Fun-Kids-s67862/	0	Radio Indexed Db	https://tunein.com/radio/Fun-Kids-s67862/
+Fun Radio	http://www.internetradiouk.com/mobile/fun-radio-uk/	0	Radio Stream	http://edge-audio-02-gos1.sharp-stream.com/funkids.mp3.m3u
+Heart Radio	http://media-sov.musicradio.com:80/Heart80s	0	Radio Indexed Db	http://media-sov.musicradio.com:80/Heart80s
+Heart Radio	http://media-ice.musicradio.com/Heart80s/	0	Radio Stream	http://media-ice.musicradio.com/HeartLondon.m3u
+Imagine FM	http://www.internetradiouk.com/mobile/imagine/	0	Radio Stream	http://stream2.radiomonitor.com/Imagine?token=Y4d9ZmaDhGpkg4d6n7O0mqC3
+Jazz FM	http://www.internetradiouk.com/mobile/jazz-fm/	0	Radio Stream	http://adsi-e-01-cr.sharp-stream.com/jazzfm.aac.m3u
+Jazz FM	https://tunein.com/radio/Jazz-FM-s45300/	0	Radio Indexed Db	https://tunein.com/radio/Jazz-FM-s45300/
+Jazz FM	http://www.jazzfm.com/player/	0	Radio Indexed Db	http://www.jazzfm.com/player/
+Kane FM	http://www.internetradiouk.com/mobile/kane-fm/	0	Radio Stream	http://stream.kanefm.com:1037/listen.m3u
+Kiss FM	https://tunein.com/radio/KISS-1000-s6004/	0	Radio Indexed Db	https://tunein.com/radio/KISS-1000-s6004/
+Kiss FM	http://www.internetradiouk.com/mobile/kiss-london/	0	Radio Stream	http://icy-e-ba-05-cr.sharp-stream.com/kissnational.aac.m3u
+LBC	http://media-sov.musicradio.com:80/LBC1152	0	Radio Indexed Db	http://media-sov.musicradio.com:80/LBC1152
+LBC	http://www.internetradiouk.com/mobile/lbc/	0	Radio Stream	http://media-ice.musicradio.com/LBC973.m3u
+Magic FM	https://tunein.com/radio/Magic-Radio-UK-1054-s8213/	0	Radio Indexed Db	https://tunein.com/radio/Magic-Radio-UK-1054-s8213/
+Magic FM	http://www.internetradiouk.com/mobile/magic-london/	0	Radio Stream	http://icy-e-bz-06-cr.sharp-stream.com/magic1054.aac.m3u
+Magic Radio	https://planetradio.co.uk/magic/	0	Radio Stream	http://listen.magic.co.uk/909?clientid=777712940.1505393354
+Manx Radio	http://www.internetradiouk.com/mobile/manx/	0	Radio Stream	http://edge-event-01-cr.sharp-stream.com/manxradiofm.mp3.m3u
+Planet Rock	https://planetradio.co.uk/planet-rock/player/	0	Radio Indexed Db	https://planetradio.co.uk/planet-rock/player/
+Planet Rock	http://www.internetradiouk.com/mobile/planet-rock/	0	Radio Stream	http://icy-e-bz-06-cr.sharp-stream.com/planetrock.aac.m3u
+Radio Caroline UK	http://www.internetradiouk.com/mobile/caroline/	0	Radio Stream	http://sc3.radiocaroline.net:8030/listen.pls?sid=1
+Radio X	http://media-sov.musicradio.com:80/RadioXLondon	0	Radio Indexed Db	http://media-sov.musicradio.com:80/RadioXLondon
+Radio X	http://www.internetradiouk.com/mobile/x/	0	Radio Stream	http://media-sov.musicradio.com/RadioXUK.m3u
+Rinse FM	https://tunein.com/radio/Rinse-FM-1068-s92775/	0	Radio Indexed Db	https://tunein.com/radio/Rinse-FM-1068-s92775/
+Rinse FM	http://www.internetradiouk.com/mobile/rinse-fm/	0	Radio Stream	http://streamer.dgen.net:8000/rinseradio.m3u
+Serenade Radio	http://www.internetradiouk.com/mobile/serenade-radio/	0	Radio Stream	http://4534.cloudrad.io:8284/listen.pls?sid=1
+Sheffield Live	http://www.internetradiouk.com/mobile/sheffield/	0	Radio Stream	http://live.sheffieldlive.org:8000/listen.pls?sid=1
+Smooth Radio	http://media-sov.musicradio.com:80/SmoothUK	0	Radio Indexed Db	http://media-sov.musicradio.com:80/SmoothUK
+Smooth Radio	http://www.internetradiouk.com/mobile/smooth/	0	Radio Stream	http://media-ice.musicradio.com/SmoothLondon.m3u
+Solar Radio	https://tunein.com/radio/Solar-Radio-s25233/	0	Radio Indexed Db	https://tunein.com/radio/Solar-Radio-s25233/
+Solar Radio	http://www.internetradiouk.com/mobile/solar/	0	Radio Stream	http://svr1.msmn2.co:8336/listen.pls?sid=1
+Splash FM	https://tunein.com/radio/More-Radio-Worthing-1077-s8398/	0	Radio Indexed Db	https://tunein.com/radio/More-Radio-Worthing-1077-s8398/
+Splash FM	http://www.internetradiouk.com/mobile/splash/	0	Radio Stream	http://s3.xrad.io:8096/listen.pls?sid=1
+Stray FM	http://www.strayfm.com/radioplayer/	1	Radio Indexed Db	http://www.strayfm.com/radioplayer/
+Stray FM	http://www.internetradiouk.com/mobile/stray-fm/	1	Radio Stream	http://fg3.sad.ukrd.com/stray?ts=1505421970
+Sunshine Radio	http://www.sunshineradio.co.uk/hm/player/	0	Radio Indexed Db	http://www.sunshineradio.co.uk/hm/player/
+Sunshine Radio	http://www.internetradiouk.com/mobile/sunshine-hereford/	0	Radio Stream	http://icecast.easystream.co.uk:8000/herefordFM.m3u
+Team Rock	http://teamrock.com/radio/player/	0	Radio Indexed Db	http://teamrock.com/radio/player/
+Team Rock	http://www.internetradiouk.com/mobile/teamrock/	0	Radio Stream	https://stream.radio.co/s79158a158/listen
+The Arrow UK	http://media-sov.musicradio.com:80/Arrow	0	Radio Indexed Db	http://media-sov.musicradio.com:80/Arrow
+The Arrow UK	http://www.internetradiouk.com/mobile/arrow/	0	Radio Stream	http://ice-the.musicradio.com/ArrowMP3.m3u
+The Breeze FM	http://www.thebreeze.com/newbury/radioplayer/	0	Radio Indexed Db	http://www.thebreeze.com/newbury/radioplayer/
+The Breeze FM	http://www.internetradiouk.com/mobile/the-breeze/	0	Radio Stream	http://stream4.radiomonitor.com/Breeze-Newbury-128.m3u
+The Eagle	https://www.964eagle.co.uk/listenatwork/	0	Radio Indexed Db	https://www.964eagle.co.uk/listenatwork/
+The Eagle	http://www.964eagle.co.uk/radioplayer/	0	Radio Indexed Db	http://www.964eagle.co.uk/radioplayer/
+Tune In	https://tunein.com/radio/London-r100780/	0	Radio Host	https://tunein.com/radio/London-r100780/
+UK Radio	http://www.internetradiouk.com/mobile/	0	Radio Host	http://www.internetradiouk.com/mobile/

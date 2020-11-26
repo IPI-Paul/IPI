@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="IE=10">
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta name="GENERATOR" content="Microsoft Visual Studio Community 2015" /><!-- CREATION DATE: 14/09/2017 -->
+    <meta content="IPI International, Microsoft, IndexedDB, Database, videos, Paul I Ighofose, Paul Ighofose, IPI, Ighofose, IP, music, media"
+          name="Keywords" />
+    <meta content="Music Video Active Desktop Page by Paul I Ighofose - IPI International. Further Projects using IndexedDB database."
+          name="Description" />
+    <meta content="Paul I Ighofose - IPI International" name="Author" />
+    <meta content="all" name="Robots" />
+    <meta content="designs@ipi2internation.free-online.co.uk" name="Email" />
+    <meta content="Paul I Ighofose - IPI International" name="Copyright" />
+    <meta content="en" name="Language" />
+    <meta content="General" name="Rating" />
+    <meta content="Global" name="Distribution" />
+    <title>Media Player Active Desktop Web Page by Paul I Ighofose - IPI International</title>
+    <script language="javascript" type="text/javascript">
+        var a, nav = navigator.userAgent;
+        a = "<script type='text/javascript' src='./scripts/idb alljava.js'><" + "/script>";
+        if (nav.toLowerCase().search('msie') > 0 || nav.toLowerCase().search('rv:11') > 0) {
+            a = a + "\n<script type='text/javascript' src='./scripts/idb iejava.js'><" + "/script>";
+            a = a + "\n<script type='text/vbscript' src='./scripts/idb vb.vbs'><" + "/script>";
+        }
+        else {
+            a = a + "\n<script type='text/javascript' src='./scripts/idb java.js'><" + "/script>";
+        }
+        document.write(a);
+    </script>
+</head>
+<body onload="listStores();">
+    <div id="player" style="width:99%; max-height:70%; position:initial; overflow:scroll">
+        <iframe id="frmView" style="width:100%;" height="0"></iframe>
+    </div>
+    <table>
+        <tr>
+            <td colspan="6">
+                Store Name: <input size="20" id="strNm" value="IPI Media" onclick="value = prompt('Store Name', value);" />
+                <select id="idbStrs" style="width:20px;" onchange="listSelect();" onblur="if (selectedIndex != 0) { selectedIndex = 0;}"></select>
+                Index Name: <input size="30" id="idxNm" onclick="value = prompt('Index Name', value);" />
+                <select id="idbIdx" style="width:20px;" onchange="indexSelect();" onblur="if (selectedIndex != 0) { selectedIndex = 0;}"></select>
+                Filter By: <input size="30" id="idxFlt" onclick="value = prompt('Filter Index By', value);" />
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                Col1
+            </td>
+            <td>
+                Col2
+            </td>
+            <td>
+                Col3
+            </td>
+            <td>
+                Col4
+            </td>
+            <td>
+                Col5
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Names
+            </td>
+            <td>
+                <input size="25" id="Col1" value="TrackName" onclick="value = prompt('Column 1 Name', value);" />
+            </td>
+            <td>
+                <input size="30" id="Col2" value="FilePath" onclick="value = prompt('Column 2 Name', value);" />
+            </td>
+            <td>
+                <input size="4" id="Col3" value="Played" onclick="value = prompt('Column 3 Name', value);" />
+            </td>
+            <td>
+                <input size="10" id="Col4" value="Favourite" onclick="value = prompt('Column 4 Name', value);" />
+            </td>
+            <td>
+                <input size="50" id="Col5" value="FileURL" onclick="value = prompt('Column 5 Name', value);" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Where
+            </td>
+            <td>
+                <input size="25" id="Whr1" onclick="value = prompt(document.getElementById('Col1').value, value);" />
+            </td>
+            <td>
+                <input size="30" id="Whr2" onclick="value = prompt(document.getElementById('Col2').value, value);" />
+            </td>
+            <td>
+                <input size="4" id="Whr3" onclick="value = prompt(document.getElementById('Col3').value, value)" />
+            </td>
+            <td>
+                <input size="10" id="Whr4" onclick="value = prompt(document.getElementById('Col4').value, value)" />
+            </td>
+            <td>
+                <input size="50" id="Whr5" onclick="value = prompt(document.getElementById('Col5').value, value)" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Values
+            </td>
+            <td>
+                <input size="25" id="Val1" onclick="value = prompt(document.getElementById('Col1').value, value);" />
+            </td>
+            <td>
+                <input size="30" id="Val2" onclick="value = prompt(document.getElementById('Col2').value, value);" />
+            </td>
+            <td>
+                <input size="4" id="Val3" onclick="value = prompt(document.getElementById('Col3').value, value)" />
+            </td>
+            <td>
+                <input size="10" id="Val4" onclick="value = prompt(document.getElementById('Col4').value, value)" />
+            </td>
+            <td>
+                <input size="50" id="Val5" onclick="value = prompt(document.getElementById('Col5').value, value)" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                <span>File Location: </span>
+                <input id="frmSrc" size="30" onclick="frameSrcCh(value);" value="./" />
+                <input id="ldTm" size="2" value="7" onclick="value = prompt('Amend to increase or decrease the time to wait for the results table to populate before Sorting!', value);" />
+                <select id="DrvPth" name="DrvPth" onchange="DrvPthCh();" hidden="hidden"></select>
+                <select id="SvTp" name="SvTp">
+                    <option value="1">All</option>
+                    <option value="2">Music</option>
+                    <option value="3">Picture</option>
+                    <option value="4">Video</option>
+                    <option value=".JS">.JS</option>
+                    <option value="ASF">ASF</option>
+                    <option value="AVI">AVI</option>
+                    <option value="BAT">BAT</option>
+                    <option value="BMP">BMP</option>
+                    <option value="CDA">CDA</option>
+                    <option value="CSV">CSV</option>
+                    <option value="DOC">DOC</option>
+                    <option value="DVD">DVD</option>
+                    <option value="DVX">DVX</option>
+                    <option value="FLV">FLV</option>
+                    <option value="GIF">GIF</option>
+                    <option value="HTM">HTM</option>
+                    <option value="ICO">ICO</option>
+                    <option value="INF">INF</option>
+                    <option value="INI">INI</option>
+                    <option value="JPG">JPG</option>
+                    <option value="LOG">LOG</option>
+                    <option value="MDI">MDI</option>
+                    <option value="MP3">MP3</option>
+                    <option value="MP4">MP4</option>
+                    <option value="MPE">MPE</option>
+                    <option value="MPG">MPG</option>
+                    <option value="MPV">MPV</option>
+                    <option value="PCX">PCX</option>
+                    <option value="PEG">PEG</option>
+                    <option value="PNG">PNG</option>
+                    <option value="PPT">PPT</option>
+                    <option value="RTF">RTF</option>
+                    <option value="SYS">SYS</option>
+                    <option value="SWF">SWF</option>
+                    <option value="TIF">TIF</option>
+                    <option value="TXT">TXT</option>
+                    <option value="VBS">VBS</option>
+                    <option value="WAV">WAV</option>
+                    <option value="WMA">WMA</option>
+                    <option value="WMV">WMV</option>
+                    <option value="XLS">XLS</option>
+                    <option value="XLT">XLT</option>
+                </select>
+                <input type="file" id="getfiles" onchange="getFile();" onsubmit="getFile();" multiple />
+                <input type="button" id="posBgn" onclick="posStart();" value="Play From" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                <select id="cboPlayList" onchange="if (selectedIndex != 0) { playListCh(value); selectedIndex = 0; }" onblur="if (selectedIndex != 0) { selectedIndex = 0; }">
+                    <option selected="selected">Select a Play List</option>
+                    <option value="ReadMe.pdf">Help</option>
+                    <option value="./play lists/Radio iDb.htm">Radio</option>
+                    <option value="./play lists/Radio iDb.txt">Radio Text</option>
+                    <option value="./play lists/YouTube iDb.htm">YouTube</option>
+                    <option value="./play lists/YouTube iDb.txt">YouTube Text</option>
+                    <option value="https://addons.mozilla.org/firefox/addon/446">Firefox Windows Media Addon</option>
+                </select>
+                <span>Search </span><input type="search" onchange="srchTbl(value);" />
+                <select id="tblSel" style="width:20px;" onchange="tblSelect(value);" onblur="if (selectedIndex != 0) { selectedIndex = 0;}"></select>
+                <input id="PTm" size="3" value="10" onclick="value = prompt('Amend to increase or decrease Speed of Image file change', value);" />
+                <select id="FlSt">
+                    <option value="1" selected="selected">Increment</option>
+                    <option value="2">Once</option>
+                    <option value="3">Repeat</option>
+                    <option value="4">Reverse</option>
+                    <option value="5">Shuffle</option>
+                    <option value="6">Stop</option>
+                </select>
+                <select id="cboFunction" onchange="if (selectedIndex != 0) { callFunction(selectedIndex); }" onblur="if (selectedIndex != 0) { selectedIndex = 0; }">
+                    <option selected="selected">Select a Function</option>
+                    <option>Delete Database</option>
+                    <option>Create Store</option>
+                    <option>Delete Store</option>
+                    <option>View/Refresh Results Store</option>
+                    <option>Show/Hide iFrame</option>
+                    <option>Show/Hide Editor</option>
+                    <option>Insert Row</option>
+                    <option>Create Upload Table from All</option>
+                    <option>Create Upload Table from Selected</option>
+                    <option>Create WebSQL Insert Transaction from Results as HTML</option>
+                    <option>Create WebSQL Insert Transaction from Results as Table</option>
+                    <option>Delete Row</option>
+                    <option>Delete All</option>
+                    <option>Reset Played</option>
+                    <option>Replace Text</option>
+                    <option>Make iFrame Table Full Page</option>
+                    <option>Make Results Table Full Page</option>
+                    <option>Get Document Location</option>
+                    <option>Copy iFrame</option>
+                    <option>Get iFrame Location</option>
+                    <option>Get iFrame Video Source</option>
+                    <option>Clear Editor</option>
+                    <option>Run Editor As JavaScript</option>
+                    <option>Create iFrame Table Element from Editor</option>
+                    <option>Create iFrame Table Element from iFiles Display</option>
+                    <option>Create iFrame Table Element from Mobilelite Display</option>
+                    <option>Upload iFrame Table Element</option>
+                    <option>Upload from Database Results in iFrame</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                <input id="rws" style="visibility:hidden;" />
+                <textarea id="txtView" rows="1" style="width:98%; visibility: hidden;"></textarea>
+            </td>
+        </tr>
+    </table>
+    <div style="width:99%; max-height:74%; position:absolute; overflow:scroll">
+        <table id="tblResults" style="table-layout:fixed" width="950"></table>
+    </div>
+</body>
+</html>
