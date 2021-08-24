@@ -1,0 +1,19 @@
+<mso:customUI xmlns:x1="http://schemas.microsoft.com/office/2009/07/customui/macro" xmlns:mso="http://schemas.microsoft.com/office/2009/07/customui">
+  <mso:ribbon>
+    <mso:qat/>
+    <mso:tabs>
+      <mso:tab id="mso_c1.12280743" label="IPI Paul" insertBeforeQ="mso:TabAddIns">
+        <mso:group id="mso_c2.12280743" label="Add Ins" imageMso="HappyFace" autoScale="true">
+          <mso:button idQ="x1:Project1.startEvent_0_12296915" label="Start Events" imageMso="DiagramTargetInsertClassic" onAction="Project1.startEvent" visible="true"/>
+          <mso:button idQ="x1:Project1.endEvent_1_12296915" label="End Events" imageMso="CancelRequest" onAction="Project1.endEvent" visible="true"/>
+        </mso:group>
+        <mso:group id="mso_c1.A913728" label="Speech" autoScale="true">
+          <mso:button idQ="x1:Project1.readClipboard_0_A936A63" label="Read Clipboard" imageMso="WebServerDiscussions" onAction="Project1.readClipboard" visible="true"/>
+          <mso:button idQ="x1:Project1.readEntireEmail_1_A936A63" label="Read Entire Email" imageMso="RmsSendBizcardDesign" onAction="Project1.readEntireEmail" visible="true"/>
+          <mso:button idQ="x1:Project1.readOutFile_2_A936A63" label="Read Out File" imageMso="SourceControlCheckOut" onAction="Project1.readOutFile" visible="true"/>
+          <mso:button idQ="x1:Project1.readSelectedText_3_A936A63" label="Read Selected Text" imageMso="TableBorderPenColorPicker" onAction="Project1.readSelectedText" visible="true"/>
+        </mso:group>
+      </mso:tab>
+    </mso:tabs>
+  </mso:ribbon>
+</mso:customUI>

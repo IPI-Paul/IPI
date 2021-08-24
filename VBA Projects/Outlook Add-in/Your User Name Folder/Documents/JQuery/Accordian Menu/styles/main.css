@@ -1,0 +1,35 @@
+﻿table, body, input, select {
+    font-size: 8pt;
+    font-family: Arial, Calibri, 'Times New Roman';
+}
+
+table {
+    border-collapse: collapse;
+    position: absolute;
+    top: 40;
+    overflow: scroll;
+}
+
+th {
+    background-color: RGB(0, 94, 184);
+    color: RGB(255, 255, 255);
+}
+
+#selBtn {
+    position: fixed;
+    top: 0;
+    z-index: 100;
+}
+
+td, th {
+    padding: 2px 7px 2px 7px;
+}
+
+input, select {
+    outline: hidden;
+    border-width: 0 0 1px;
+}
+
+.noBorders {
+    border: none;
+}

@@ -1,0 +1,181 @@
+<html>
+<head>
+    <base href="#popupNested">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=10, user-scalable=yes">
+    <title>IPI Paul - JQuery List Selector</title>
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="stylesheet" href="styles/fonts.css">
+    <link rel="stylesheet" href="styles/jquery.mobile-1.4.5.min.css">
+    <link id="stlMain" rel="stylesheet" href="styles/main.css">
+    <script type="text/javascript" language="javascript" src="scripts/jquery-3.5.1.js"></script>
+    <script language="javascript" type="text/javascript" src="scripts/java.js"></script>
+    <script language="javascript" type="text/javascript" id="td-select-script">
+        $(document).ready(function () {
+            $('body').on('click', 'td', function () {
+                if ($(this)[0].className != 'func') {
+                    if ($(this)[0].style.backgroundColor == "rgb(253, 233, 217)") {
+                        $(this).css('background-color', 'rgb(255, 255, 255)')
+                    } else {
+                        $(this).css('background-color', 'rgb(253, 233, 217)')
+                    }
+                    setIndex(this, $(this).parent().parent().children('tr').index($(this).parent()), $(this).parent().children('td').index(this));
+                    getHighLt();
+                }
+            });
+            $('body').on('click', 'th', function () {
+                if ($(this)[0].className != 'func') {
+                    setIndex(this, $(this).parent().parent().children('tr').index($(this).parent()), $(this).parent().children('th').index(this));
+                }
+            });
+        });
+    </script>
+    <script src="scripts/jquery.js"></script>
+    <script src="scripts/index.js"></script>
+    <script src="scripts/jquery.mobile-1.4.5.min.js"></script>
+    <script id="popup-arrow-script">
+        $(document).ready(function () {
+            $.mobile.document.on("click", "#open-popupArrow", function (evt) {
+                $("#popupArrow").popup("open", { x: evt.pageX, y: evt.pageY });
+                evt.preventDefault();
+            });
+        });
+    </script>
+    <style id="tblStl"></style>
+    <style id="popup-arrow-css">
+        .clickable-area {
+            display: block;
+            width: 100%;
+            height: 300px;
+            background-color: #ffefef;
+        }
+
+            .clickable-area:focus {
+                outline: 0;
+            }
+    </style>
+    <style id="tooltip-btn">
+        .ui-btn.my-tooltip-btn,
+        .ui-btn.my-tooltip-btn:hover,
+        .ui-btn.my-tooltip-btn:active {
+            background: none;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <a id="selBtn" ondblclick="window.history.back();" href="#popupNested" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-bars ui-btn-icon-left ui-btn-b" data-transition="pop">Select Function...</a>
+    <div data-role="popup" id="popupNested" data-theme="none">
+        <div data-role="collapsibleset" data-theme="b" data-content-theme="a" data-collapsed-icon="arrow-r" data-expanded-icon="arrow-d" style="margin:0; width:250px;">
+            <div data-role="collapsible" data-inset="false">
+                <h2>Current View Menu</h2>
+                <ul data-role="listview">
+                    <li><a href="#" data-rel="dialog" onclick="appPrefix();">Append Prefix</a></li>
+                    <li><a href="#" data-rel="dialog" onclick="appPrefixCol();">Append Prefix to Column</a></li>
+                    <li><a href="#" data-rel="dialog" onclick="appSuffix();">Append Suffix</a></li>
+                    <li><a href="#" data-rel="dialog" onclick="appSuffixCol();">Append Suffix to Column</a></li>
+                    <li><a href="#" data-rel="dialog" onclick="clrHighLt();">Clear Highlighted Cells</a></li>
+                    <li><a href="#" data-rel="dialog" onclick="keepSel();">Keep Selected Text</a></li>
+                    <li><a href="#" data-rel="dialog" onclick="keepSelCol();">Keep Selected Text in Column</a></li>
+                    <li><a href="#" data-rel="dialog" onclick="remSel();">Remove Selected Text</a></li>
+                    <li><a href="#" data-rel="dialog" onclick="remSelCol();">Remove Selected Text in Column</a></li>
+                    <li><a href="#" data-rel="dialog" onclick="rplSel();">Replace Selected Text</a></li>
+                    <li><a href="#" data-rel="dialog" onclick="rplTxt();">Replace Text</a></li>
+                    <li><a href="#" data-rel="dialog" onclick="rplTxtCol();">Replace Text in Column</a></li>
+                </ul>
+            </div><!-- /collapsible -->
+            <div data-role="collapsible" data-inset="false">
+                <h2>Excel Menu</h2>
+                <div data-role="collapsible" data-inset="false">
+                    <h2>New Workbook</h2>
+                    <ul data-role="listview">
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,1,0');">Add All Rows</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,1,1');">Add Highlighted Rows</a></li>
+                    </ul>
+                </div><!-- /collapsible -->
+                <div data-role="collapsible" data-inset="false">
+                    <h2>Open Workbook</h2>
+                    <ul data-role="listview">
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,1,2');">Add All Rows</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,1,3');">Add Highlighted Rows</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,1,4,' + getHighLtArr());">Filter by Highlighted Text and Header</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,1,5,' + getHighLtArr());">Filter by Highlighted Text and Mapping</a></li>
+                    </ul>
+                </div><!-- /collapsible -->
+            </div><!-- /collapsible -->
+            <div data-role="collapsible" data-inset="false">
+                <h2>Ms Access Menu</h2>
+                <ul data-role="listview">
+                    <li><a href="#" data-rel="dialog" onclick="runScript('0,2,0,' + getHighLtArr());">Filter Query by Highlighted Text and Header</a></li>
+                    <li><a href="#" data-rel="dialog" onclick="runScript('0,2,1,' + getHighLtArr());">Filter Form by Highlighted Text and Header</a></li>
+                    <li><a href="#" data-rel="dialog" onclick="runScript('0,2,2,' + getHighLtArr());">Filter Report by Highlighted Text and Header</a></li>
+                </ul>
+            </div><!-- /collapsible -->
+            <div data-role="collapsible" data-inset="false">
+                <h2>Oulook Menu</h2>
+                <div data-role="collapsible" data-inset="false">
+                    <h2>Search</h2>
+                    <ul data-role="listview">
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,0,' + getHighLt());">Find Highlighted in Frequently used Fields</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,1,' + getSel());">Find Selection in Frequently used Fields</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,2,' + getHighLt());">Find Highlighted in User Defined Properties</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,3,' + getSel());">Find Selection in User Defined Properties</a></li>
+                    </ul>
+                    <div data-role="collapsible" data-inset="false">
+                        <h2>User Defined Properties</h2>
+                        <ul data-role="listview">
+                            <li><a href="#" data-rel="dialog" onclick="runScript('0,3,4,' + getHighLt());">Find Highlighted in Invoices</a></li>
+                            <li><a href="#" data-rel="dialog" onclick="runScript('0,3,5,' + getHighLt());">Find Highlighted in Orders</a></li>
+                            <li><a href="#" data-rel="dialog" onclick="runScript('0,3,6,' + getHighLt());">Find Highlighted in Vendor Id</a></li>
+                            <li><a href="#" data-rel="dialog" onclick="runScript('0,3,7,' + getHighLt());">Find Highlighted in Vendor Name</a></li>
+                            <li><a href="#" data-rel="dialog" onclick="runScript('0,3,8,' + getSel());">Find Selection in Invoices</a></li>
+                            <li><a href="#" data-rel="dialog" onclick="runScript('0,3,9,' + getSel());">Find Selection in Orders</a></li>
+                            <li><a href="#" data-rel="dialog" onclick="runScript('0,3,10,' + getSel());">Find Selection in Vendor Id</a></li>
+                            <li><a href="#" data-rel="dialog" onclick="runScript('0,3,11,' + getSel());">Find Selection in Vendor Name</a></li>
+                        </ul>
+                    </div><!-- /collapsible -->
+                </div><!-- /collapsible -->
+                <div data-role="collapsible" data-inset="false">
+                    <h2>Transfer</h2>
+                    <ul data-role="listview">
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,12,' + getHighLtArr());">Insert All Rows into New Email</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,13,' + getHighLtArr());">Insert All Rows into Outlook Item</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,14,' + getHighLtArr());">Insert Highlighted into New Email</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,15,' + getHighLtArr());">Insert Highlighted into Outlook Item</a></li>
+                    </ul>
+                </div><!-- /collapsible -->
+                <div data-role="collapsible" data-inset="false">
+                    <h2>User Defined Properties</h2>
+                    <ul data-role="listview">
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,16');">Delete Properties</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,17');">Map Page Headers</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,18');">Show Outlook Item Propeties</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,19');">Update Invoices</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,20');">Update Invoices from Highlighted</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,21');">Update Orders</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,22');">Update Orders from Highlighted</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,23');">Update Using Form</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,24');">Update Using Form and Highlighted</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,25');">Update Using Mapping</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,3,26');">Update Using Mapping and Highlighted</a></li>
+                    </ul>
+                </div><!-- /collapsible -->
+            </div><!-- /collapsible -->
+                <div data-role="collapsible" data-inset="false">
+                    <h2>Word Menu</h2>
+                    <ul data-role="listview">
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,4,0,' + getHighLtArr());">Insert All Rows into Document</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,4,1,' + getHighLtArr());">Insert All Rows into New Document</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,4,2,' + getHighLtArr());">Insert Highlighted into Document</a></li>
+                        <li><a href="#" data-rel="dialog" onclick="runScript('0,4,3,' + getHighLtArr());">Insert Highlighted into New Document</a></li>
+                    </ul>
+                </div><!-- /collapsible -->
+            </div><!-- /collapsible set -->
+    </div><!-- /popup -->
+    <div>
+        <table id="tblDtl"></table>
+        <br clear="left" />
+    </div>
+</body>
+</html>
+
