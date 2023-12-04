@@ -1,0 +1,52 @@
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  .tick line {
+    stroke: #C0C0BB;
+  }
+  .tick text {
+    fill: #635F5D;
+  }
+  .marks circle {
+    fill: #137b80;
+    opacity: 0.3;
+  }
+  .axis-label {
+    font-size: 1.3em;
+    fill: #635F5D;
+  }
+  circle, rect {
+    fill: #137b80;
+  }
+  .marks .pLand {
+    fill: #ececec;
+  }
+  .marks .pSphere {
+    fill: #fbfbfb;
+  }
+  .marks .pInteriors {
+    fill: none;
+    stroke: #d9dfe0;
+  }
+  .marks .pGraticules, .multi .leftTick line, .multi .bottomTick line {
+    fill: none; 
+    stroke: #ececec;
+  }
+  .axis-label-multi {
+    font-size: 0.5em;
+  }
+  .multi .leftTick text, .multi .bottomTick text { 
+    font-size: 0.5em;
+  }
+  .bgWhite {
+    fill: white;
+  }
+  #brushRef .overlay {
+    fill: none;
+  }
+  .handle {
+    fill: none;
+  }
