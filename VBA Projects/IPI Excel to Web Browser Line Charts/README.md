@@ -1,4 +1,4 @@
-# IPI Excel to Web Browser Line Charts
+# IPI Excel to Web Browser Line & Map Charts
 
 ## References
 I combined parts of my course work from the following courses to build the html code, styles and scripts.
@@ -13,6 +13,7 @@ In 26 years of programming and developing Microsoft solutions this project achie
 ## Function
  - The Main tab allows the user to choose:
    - The worksheet to generate the chart from.
+   - What chart type to run.
    - The title to use in the chart.
    - The positioning of the Chrome App when loaded.
    - The column names to use in the x-axis, y-axis and Legend.
