@@ -4,7 +4,7 @@ In work meetings I often wanted to add notes to Outlook items being the focus of
 
 ## How to Install
 
-The easiest way to get up and running is to copy the VbaProject.OTM to your %appdata%\Microsoft\Outlook folder if you don't already have any VBA Code in your Outlook VBA Project. The other way is to import each of the VBA Forms/Modules into your VBA Project. Copy the jQuery file to a location and edit the VBA Project function jScript
+The easiest way to get up and running is to copy the VbaProject.OTM to your %appdata%\Microsoft\Outlook folder if you don't already have any VBA Code in your Outlook VBA Project. The other way is to import each of the VBA Forms/Modules into your VBA Project. Copy the jQuery file to a location and edit the VBA Project function jScript.
 
 Then add an Outlook Ribbon item pointed at the sub addEmailNotes and save the database files to a secure location (ensuring to alter the VBA function getDocsFolder to point at that location).
 
