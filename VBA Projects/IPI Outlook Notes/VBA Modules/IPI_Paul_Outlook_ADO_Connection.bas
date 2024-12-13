@@ -75,7 +75,7 @@ Sub adoMsAccess(cSQL As Variant, fPath As Variant, Optional cType As Variant = "
             With Cmd
                 .ActiveConnection = Conn
                 .CommandText = cSQL
-                Set Pm = .CreateParameter("long_text", 203, 1, 200000) '203 = adLongVarWChar, 1 = adParamInput
+                Set Pm = .CreateParameter("long_text", 203, 1, 1070000000) '203 = adLongVarWChar, 1 = adParamInput
                 Pm.Value = param
                 .Parameters.Append Pm
                 Set rst = .Execute
