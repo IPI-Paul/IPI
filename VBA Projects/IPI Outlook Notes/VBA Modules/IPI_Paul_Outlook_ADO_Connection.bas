@@ -145,7 +145,7 @@ Sub adoSQL(cSQL As String, Optional db As String = "LocalDb", Optional cMethod A
                     .ActiveConnection = Conn
                     .CommandText = cSQL
                     .CommandType = 1
-                    Set Pm = .CreateParameter("long_text", 203, 1, 200000) '203 = adLongVarWChar, 1 = adParamInput
+                    Set Pm = .CreateParameter("long_text", 203, 1, 1070000000) '203 = adLongVarWChar, 1 = adParamInput
                     Pm.Value = param
                     .Parameters.Append Pm
                     Set rst = .Execute
