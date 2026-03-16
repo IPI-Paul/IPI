@@ -35,3 +35,22 @@ In 26 years of programming and developing Microsoft solutions this project achie
 ## What this means
 
 Excel/VBA now has a way to generate geospacial charts and other web page designs using version 7.6.1 of D3 from <https://d3js.org>.
+
+## Secure API
+
+- With a bit of help from ChatGPT I have added a .Net Framework Win Forms API to ensure all data remains within Excel and nothing is written to any temporary file.
+- The API uses Microsofts Edge View SDK to generate a form for viewing the web content.
+- You will need to register the COM Object before you can add it in the VBA project.
+- To register the API, go to the folder you saved the API folder to and right click the DLL file ExcelWebView2Wrapper.dll and select `Copy as path`. Pre Windows 11, use Shift Left Click to see the menu item.
+- Then open Command Prompt elevated as Admin and run the following command after pasting in the path copied:
+
+  `"C:\Windows\Microsoft.NET\Framework\v4.0.30319\RegAsm.exe" /codebase /tlb PastePathEntryHere`
+
+- Once the ExcelWebView2Wrapper.tlb file is created, follow the steps below to find it an load it into the Excel documents VBA project:
+
+  `VBA Project => Tools => References => Browse => Select ExcelWebView2Wrapper.tlb`
+
+- Close the VBA window and save the Excel file.
+- Click the `View Chart Securely` button to send the data securely to the API and view the output:
+
+  ![Image of Excel Secure Map Viewer](./images/ExcelMapView.gif)
