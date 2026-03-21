@@ -51,6 +51,6 @@ Excel/VBA now has a way to generate geospacial charts and other web page designs
   `VBA Project => Tools => References => Browse => Select ExcelWebView2Wrapper.tlb`
 
 - Close the VBA window and save the Excel file.
-- Click the `View Chart Securely` button to send the data securely to the API and view the output:
+- Click the `View Chart Securely` button to send the data securely to the API and view the output. Now split this into a separate file inorder to make prior version usable without need to register COM Object:
 
   ![Image of Excel Secure Map Viewer](./images/ExcelMapView.gif)
