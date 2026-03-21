@@ -1,0 +1,181 @@
+
+    body {
+        margin: 0;
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+    }
+    #outHTML iframe {
+        border: none;
+    }
+    h3, pre {
+        margin: 5px;
+    }
+    pre, .multi-line-legend {
+        font-size: 1.15em;
+    }
+    .lines {
+        stroke: black; 
+        stroke-width: 10;
+    }
+    .lines path {
+        stroke: #25656d;
+        stroke-linejoin: round;
+    }
+    #code, #root {
+        margin-top: 20px;
+    }
+    .bar-chart rect, .bar-chart circle, .line-chart rect, .line-chart circle {
+        fill: steelblue;
+    }
+    .bar-chart circle {
+        opacity: 0.2;
+    }
+    .bar-chart text, .line-chart text, .area-chart text {
+        font-family: sans-serif;
+    }
+    .tick text {
+        font-size: 1.8em;
+        fill: #635F50;
+    }
+    .tick line {
+        stroke: #C0C0BB;
+    }
+    .axis-label  {
+        font-size: 2.5em;
+        fill: #8E8883;
+    }
+    .title {
+        font-size: 2.5em;
+        fill: #635F50;
+        text-anchor: middle;
+    }
+    .menu-container select, .menus select {
+        border: none;
+        background: transparent;
+    }
+    .menu-container, .menu-container select, .x-axis-label, .y-axis-label, .menus select {
+        font-weight: bold;
+        font-size: 1.15rem;
+    }
+    .line-path, .multi-line-path, .melt-line-path {
+        fill: none;
+        stroke-width: 2;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        mix-blend-mode: multiply;
+    }
+    .line-path {
+        stroke: maroon;
+    }
+    .area-path {
+        fill: maroon;
+    }
+    .fruits, .legends, .size-legends {
+        font-size: 2em;
+    }
+    .fruits, .size-legends {
+        text-anchor: middle;
+    }
+    .bowl {
+        fill: #e5ddbc;
+    }
+    .world-atlas {
+        background-color: darkblue;
+    }
+    .earth-atlas .sphere, .choropleth-atlas .sphere, .filtered-atlas .sphere {
+        fill: #4242e4;
+    }
+    .world-atlas path, .earth-atlas .country, .filtered-atlas country {
+        fill: lightgreen;
+    }
+    .world-atlas path, .earth-atlas .country, .choropleth-atlas .choropleth, 
+        .filtered-atlas .choropleth, .circles-atlas {
+        stroke: black;
+        stroke-width: 0.05px;
+    }
+
+        .earth-atlas .country:hover, .choropleth-atlas .choropleth:hover, 
+        .filtered-atlas .choropleth:hover {
+        fill: red;
+    }
+    .world-countries path {
+        fill: none;
+        stroke: #57bdc3;
+    }
+    .world-countries text {
+        text-shadow: 
+            -1px -1px 3px white,
+            -1px 1px 3px white,
+            1px -1px 3px white,
+            1px 1px 3px white;
+        pointer-events: none;
+        font-family: sans-serif;
+    }
+    .circles-map .legend-circle, .country-circle {
+        fill: #00dbd7;
+        fill-opacity: 0.5;
+        stroke: black;
+        stroke-opacity: 0.5;
+    }
+    .choropleth-atlas .legends, .filtered-atlas .legends, .melt-line-legend {
+        font-size: 0.75em;
+    }
+    .filtered-atlas .legends {
+        cursor: pointer;
+    }
+    .filtered-atlas .highlighted {
+        stroke-width: 0.5px;
+    }
+    .menus select option, .menus text {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+    .menus, .menu-container {
+        position: fixed;
+        top: 30px;
+        left: 0;
+        right: 0;
+        text-align: center;
+    }
+    .menus text {
+        margin: 10px;
+    }
+    .circles-sphere {
+        fill: #eaeaea;
+    }
+    .circles-map:hover {
+        fill: #74e1d8;
+    }
+    .legend-title {
+        font-size: 1.4em;
+        fill: #444444;
+    }
+    .fruits, .legends, .size-legends, .legend-title, .multi-line-legend {
+        font-family: sans-serif;
+    }
+    .selected-year-line {
+        stroke: black;
+        stroke-width: 2;
+    }
+
+    .marks .pLand {
+        fill: #ececec;
+    }
+    .marks .pSphere {
+        fill: #fbfbfb;
+    }
+    .marks .pInteriors {
+        fill: none;
+        stroke: #d9dfe0;
+    }
+    .marks .pGraticules, .multi .tick line {
+        fill: none; 
+        stroke: #ececec;
+    }
+    .marks circle {
+        fill: #137b80;
+        opacity: 0.3;
+    }
